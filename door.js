@@ -16,9 +16,28 @@ document.addEventListener("DOMContentLoaded", () => {
     doorWrap.classList.remove("door-open");
   }
 
+  // تصفير حالة الباب فورًا (من غير أنيميشن) - مستخدمة لما الصفحة ترجع من ذاكرة المتصفح (bfcache)
+  function forceOpenDoorInstantly() {
+    doorWrap.classList.add("door-no-anim");
+    doorWrap.classList.remove("door-active");
+    doorWrap.classList.add("door-open");
+    // إجبار المتصفح يطبق حالة "من غير أنيميشن" قبل ما نشيلها في الفريم اللي بعده
+    void doorWrap.offsetWidth;
+    requestAnimationFrame(() => {
+      doorWrap.classList.remove("door-no-anim");
+    });
+  }
+
   // المرحلة 1: عند تحميل/إعادة تحميل أي صفحة -> الباب يتفتح بعد لحظة
-  window.addEventListener("load", () => {
-    setTimeout(openDoor, 700);
+  // استخدمنا "pageshow" بدل "load" لأن "load" مبيشتغلش تاني لما المتصفح يرجّع
+  // الصفحة من الذاكرة (bfcache) عن طريق زرار الرجوع، وده كان بيخلي الباب يفضل مقفول للأبد
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+      // الصفحة راجعة من الكاش -> افتح الباب فورًا من غير ما تستنى وبدون أنيميشن
+      forceOpenDoorInstantly();
+    } else {
+      setTimeout(openDoor, 700);
+    }
   });
 
   // المرحلة 2: عند الضغط على أي لينك حقيقي (href) داخل الموقع -> الباب يتقفل قبل الانتقال
@@ -53,6 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  ["goToCategory", "goToDirectProduct"].forEach(wrapNavigationFunction);
+  ["goToCategory", "goToDirectProduct", "goToProductDetails"].forEach(wrapNavigationFunction);
 });
 

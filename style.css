@@ -327,75 +327,6 @@ body {
     display: block;
 }
 
-.banner-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* تغميق خفيف جداً (بنسبة 20%) يبدأ من الشمال (عند النص) لـ شفاف خالص ع اليمين */
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.2), transparent);
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0 50px;
-}
-
-/* للموبايل / الشاشات الصغيرة (لو عايز التغميق يكون متساوي عشان النص ف النص) */
-@media (max-width: 768px) {
-    .banner-overlay {
-        background: rgba(0, 0, 0, 0.15); /* تغميق خفيف جداً ومتساوي */
-        padding: 0 20px;
-        justify-content: center;
-        text-align: center;
-    }
-}
-.banner-text-content {
-    max-width: 500px;
-    color: #ffffff;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-}
-
-.brand-sub-title {
-    font-size: 1.1rem;
-    color: #c5a880;
-    font-weight: 600;
-    letter-spacing: 1px;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.main-banner-title {
-    font-size: 2.8rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.banner-desc {
-    font-size: 1.2rem;
-    margin-bottom: 25px;
-    opacity: 0.95;
-    line-height: 1.5;
-}
-
-.banner-cta-btn {
-    display: inline-block;
-    background-color: #ffffff;
-    color: #0d3b1e;
-    text-decoration: none;
-    padding: 12px 30px;
-    border-radius: 25px;
-    font-weight: bold;
-    font-size: 1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.banner-cta-btn:hover {
-    background-color: #ece6d3;
-    transform: translateY(-2px);
-}
-
 /* ==========================================================================
    5. ستايل أقسام المنتجات، الزيوت والبوكسات (الكمبيوتر)
    ========================================================================== */
@@ -416,8 +347,12 @@ body {
     color: #0d3b1e;
     font-size: 1.6rem;
     font-weight: bold;
-    margin-bottom: 35px;
+    margin: 0 auto 35px auto;
     position: relative;
+    width: fit-content;
+    padding: 10px 35px;
+    border: 2px solid #0d3b1e;
+    border-radius: 30px;
 }
 
 /* تم ضبط كلاسات الـ Grid لسنترة المنتجات في المنتصف تماماً وتلافي الانحياز لليمين */
@@ -610,8 +545,12 @@ body {
     color: #0d3b1e;
     font-size: 1.6rem;
     font-weight: bold;
-    margin-bottom: 35px;
+    margin: 0 auto 35px auto;
     position: relative;
+    width: fit-content;
+    padding: 10px 35px;
+    border: 2px solid #0d3b1e;
+    border-radius: 30px;
 }
 
 .natural-slider-container {
@@ -1012,14 +951,6 @@ footer {
     .banner-img {
         object-fit: cover; /* الصورة تملى الكارت بالكامل من غير فراغ (بديل عن contain) */
     }
-    
-    .main-banner-title {
-        font-size: 2rem;
-    }
-    
-    .banner-desc {
-        font-size: 1rem;
-    }
 
     /* تحويل شبكات المنتجات (الزيوت والبوكسات) إلى سلايدر سحب أفقي ممتاز */
     .oils-grid-container, 
@@ -1065,6 +996,19 @@ footer {
     .home-slider-section {
         width: 100% !important;
         margin: 0 !important;
+        padding: 10px 0 20px 0 !important; /* تقليل المسافة اللي فوق العنوان مباشرة بعد البانر */
+    }
+
+    /* تصغير عنوان القسم وبرواز أصغر يناسب شاشة الموبايل */
+    .section-main-title,
+    .natural-section .section-title {
+        font-size: 1.1rem;
+        padding: 6px 20px;
+        margin: 0 auto 18px auto;
+        border-width: 1.5px;
+    }
+
+    .natural-section {
         padding: 20px 0 !important;
     }
 
@@ -1169,36 +1113,6 @@ footer {
 /* ==========================================================================
    14. شاشات الموبايل الصغيرة جداً (600px and down)
    ========================================================================== */
-
-.banner-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* تغميق أسود شفاف بنسبة 45% يخلي النص الأبيض يقرأ بوضوح ممتاز */
-    background: rgba(0, 0, 0, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0 50px;
-}
-
-/* إضافة ظل خفيف للحروف نفسها عشان تنطق أكثر */
-.banner-text-content h1,
-.banner-text-content p,
-.banner-text-content span {
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-}
-
-/* للموبايل والشاشات الصغيرة */
-@media (max-width: 768px) {
-    .banner-overlay {
-        padding: 0 20px;
-        justify-content: center;
-        text-align: center;
-    }
-}
 
 /* ==========================================================================
    15. ميديا كويري الشاشات الكبيرة (تثبيت المنيو الأفقي للكمبيوتر)

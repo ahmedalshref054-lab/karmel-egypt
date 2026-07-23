@@ -20,6 +20,12 @@
     transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
+/* تعطيل مؤقت للأنيميشن (مستخدم لما الصفحة ترجع من bfcache عشان الفتح يبقى فوري) */
+#door-wrap.door-no-anim .door-panel,
+#door-wrap.door-no-anim #door-center {
+    transition: none !important;
+}
+
 .door-left  { left: 0;  transform: translateX(0); }
 .door-right { right: 0; transform: translateX(0); }
 
