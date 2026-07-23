@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmel Egypt - خدمة العملاء</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="door.css">
+    <style>
+        .policy-page-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .policy-title {
+            color: #1b3c24;
+            font-size: 28px;
+            border-bottom: 3px solid #eae5c8;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .policy-content {
+            color: #333333;
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        .policy-content ul {
+            padding-right: 20px;
+            margin-top: 10px;
+        }
+        .policy-content li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- باب الدخول -->
+    <div id="door-wrap" class="door-active">
+        <div class="door-panel door-left"></div>
+        <div class="door-panel door-right"></div>
+        <div id="door-center">
+            <img src="logo.jpg" alt="Karmel Logo" id="door-logo-img">
+            <p id="door-tagline">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر 🇪🇬</p>
+        </div>
+    </div>
+
+
+    <!-- الهيدر الموحد للموقع -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-icons">
+                <a href="#" class="icon-link" onclick="openMiniCart(); return false;">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cart-count">0</span>
+                </a>
+                <a href="#" class="icon-link"><i class="fa-solid fa-magnifying-glass"></i></a>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html">الرئيسية</a>
+                <a href="#" onclick="goToCategory('natural'); return false;">المنتجات</a>
+                <a href="#" onclick="goToCategory('boxes'); return false;">البوكسات</a>
+                <a href="#" onclick="goToCategory('packages'); return false;">الباكجات</a>
+                <a href="#" onclick="goToCategory('oils'); return false;">الزيوت</a>
+            </nav>
+            <div class="logo">
+                <img src="logo.jpg" alt="Karmel Logo">
+            </div>
+        </div>
+    </header>
+
+    <!-- محتوى الصفحة المتغير -->
+    <div class="policy-page-container">
+        <h1 id="policyTitle" class="policy-title">جاري التحميل...</h1>
+        <div id="policyContent" class="policy-content">
+            <!-- الكلام بيتغير هنا تلقائياً بناءً على الضغطة -->
+        </div>
+    </div>
+
+    <!-- الفوتر الموحد للموقع -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links-col">
+                <h4>تواصل معنا</h4>
+                <ul>
+                    <li><a href="tel:01501501466"><i class="fas fa-phone"></i> 01501501466</a></li>
+                    <li><a href="mailto:auriaegypt@gmail.com"><i class="fas fa-envelope"></i> auriaegypt@gmail.com</a></li>
+                    <li><a href="https://wa.me/201501501466" target="_blank"><i class="fab fa-whatsapp"></i> تواصل عبر واتساب</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>خدمة العملاء</h4>
+                <ul>
+                    <li><a href="policy.html?page=shipping">سياسة الشحن</a></li>
+                    <li><a href="policy.html?page=return">سياسة الاستبدال والاسترجاع</a></li>
+                    <li><a href="policy.html?page=privacy">سياسات الخصوصية</a></li>
+                    <li><a href="policy.html?page=terms">الشروط والأحكام</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>الأقسام</h4>
+                <ul>
+                    <li><a href="#" onclick="goToCategory('natural'); return false;">المنتجات</a></li>
+                    <li><a href="#" onclick="goToCategory('boxes'); return false;">البوكسات</a></li>
+                    <li><a href="#" onclick="goToCategory('packages'); return false;">الباكجات</a></li>
+                    <li><a href="#" onclick="goToCategory('oils'); return false;">الزيوت</a></li>
+                </ul>
+            </div>
+            <div class="footer-brand">
+                <img src="logo.jpg" alt="Auria Logo" class="footer-logo">
+                <p class="brand-desc">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر EG</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/201501501466" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Karmel EGYPT – All Rights Reserved © 2026</p>
+        </div>
+    </footer>
+
+    <script src="door.js"></script>
+    <script src="script.js"></script>
+
+    <!-- السكريبت السحري اللي بيغير الكلام تلقائياً حسب نوع الصفحة -->
+    <script>
+        const policyData = {
+            shipping: {
+                title: "سياسة الشحن والتوصيل",
+                content: `
+                    <p>مرحباً بك في كارميل مصر. نحن نعمل جاهدين لتوصيل طلباتكم بأسرع وقت ممكن:</p>
+                    <ul>
+                        <li><strong>مدة التوصيل:</strong> يتم شحن الطلب خلال 24 إلى 48 ساعة من تأكيد الطلب، ويصلك خلال 2 إلى 5 أيام عمل حسب المحافظة.</li>
+                        <li><strong>تكلفة الشحن:</strong> تظهر تكلفة الشحن الدقيقة بعد تأكيد الطلب عبر واتساب حسب عنوان التوصيل.</li>
+                        <li><strong>تتبع الشحنة:</strong> بمجرد خروج طلبك للشحن، سيرسل لك مندوب الشحن رسالة أو اتصال لتنسيق موعد الاستلام.</li>
+                    </ul>
+                `
+            },
+            return: {
+                title: "سياسة الاستبدال والاسترجاع",
+                content: `
+                    <p>رضاكم هو أولويتنا، ولأن منتجاتنا طبيعية 100% فإننا نتبع السياسة التالية:</p>
+                    <ul>
+                        <li><strong>فترة الاسترجاع:</strong> يحق للعميل استبدال أو استرجاع المنتج خلال 14 يوماً من تاريخ الاستلام بشرط أن يكون المنتج بحالته الأصلية، غير مستخدم، وفي عبوته المغلقة.</li>
+                        <li><strong>المنتجات التالفة:</strong> إذا وصلك منتج تالف أو به خطأ، نتحمل نحن كافة تكاليف الشحن البديل دون أي رسوم إضافية عليك.</li>
+                        <li><strong>طريقة الاسترجاع:</strong> تواصل معنا عبر الواتساب أو الإيميل الموضح بالفوتر لترتيب استلام المنتج المسترجع وإعادة الأموال.</li>
+                    </ul>
+                `
+            },
+            privacy: {
+                title: "سياسات الخصوصية",
+                content: `
+                    <p>نحن في كارميل نلتزم بحماية بياناتك الشخصية لأقصى درجة:</p>
+                    <ul>
+                        <li><strong>البيانات التي نجمعها:</strong> نجمع فقط البيانات الضرورية لإتمام عملية الشحن والتوصيل (الاسم، رقم الهاتف، العنوان).</li>
+                        <li><strong>سرية المعلومات:</strong> نتعهد بعدم مشاركة أو بيع بياناتك لأي جهة خارجية خارج نطاق شركة الشحن المسؤولة عن تسليم طلبك.</li>
+                        <li><strong>أمان الطلب:</strong> يتم إرسال تفاصيل طلبك مباشرة عبر واتساب دون تخزين بيانات دفع حساسة على الموقع.</li>
+                    </ul>
+                `
+            },
+            terms: {
+                title: "الشروط والأحكام",
+                content: `
+                    <p>باستخدامك لموقع كارميل مصر، فإنك توافق على الشروط التالية:</p>
+                    <ul>
+                        <li><strong>استخدام المنتجات:</strong> جميع المعلومات الواردة عن المنتجات وفوائدها وطرق استخدامها هي نصائح استرشادية للعناية الطبيعية.</li>
+                        <li><strong>الأسعار والتوفر:</strong> نحتفظ بالحق في تعديل أسعار المنتجات أو تقديم عروض وخصومات في أي وقت حسب خطة البراند.</li>
+                        <li><strong>حقوق الملكية:</strong> جميع الصور، الشعارات، والنصوص البرمجية الموجودة على هذا الموقع هي ملك حصري لبراند KARMEL EGYPT ولا يجوز نسخها.</li>
+                    </ul>
+                `
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pageKey = urlParams.get('page');
+
+            if (pageKey && policyData[pageKey]) {
+                document.getElementById('policyTitle').innerText = policyData[pageKey].title;
+                document.getElementById('policyContent').innerHTML = policyData[pageKey].content;
+                document.title = `Karmel Egypt - ${policyData[pageKey].title}`;
+            } else {
+                document.getElementById('policyTitle').innerText = "مركز خدمة العملاء";
+                document.getElementById('policyContent').innerHTML = "<p>برجاء اختيار السياسة المطلوبة من أسفل الصفحة في الفوتر.</p>";
+            }
+        });
+    </script>
+</body>
+</html>

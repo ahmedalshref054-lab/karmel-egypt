@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmel Egypt - سلة المشتريات 🛒</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="door.css">
+    <style>
+        .icon-link { position: relative; }
+        #cart-count {
+            position: absolute;
+            top: -8px;
+            left: -10px;
+            background: #d81b1b;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+        .cart-page-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .cart-items-section {
+            flex: 2;
+            min-width: 320px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+        .cart-item img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .cart-item-details { flex: 1; }
+        .cart-item-details h3 { margin: 0 0 5px 0; font-size: 16px; color: #1b3c24; }
+        .cart-item-details p { margin: 0 0 8px 0; color: #666; font-size: 14px; }
+        .cart-item-qty { display: flex; align-items: center; gap: 8px; }
+        .cart-qty-btn {
+            width: 26px; height: 26px; border: 1px solid #ccc; background: #fafafa;
+            border-radius: 6px; cursor: pointer; font-size: 15px; line-height: 1;
+        }
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #ff4d4d;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .checkout-section {
+            flex: 1;
+            min-width: 300px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        .checkout-section h2 {
+            color: #1b3c24;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eae5c8;
+            padding-bottom: 10px;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .form-group input:focus { border-color: #1b3c24; }
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            outline: none;
+            background: #fff;
+            font-size: 14px;
+            color: #333;
+        }
+        .form-group select:focus { border-color: #1b3c24; }
+        .total-price-box {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1b3c24;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .shipping-fee-box {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin: 10px 0 0 0;
+            display: none;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px dashed #eae5c8;
+        }
+        .submit-order-btn {
+            width: 100%;
+            background-color: #1b3c24;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .submit-order-btn:hover { background-color: #14301b; }
+        .empty-cart-msg { text-align: center; padding: 40px 0; font-size: 18px; color: #666; }
+    </style>
+</head>
+<body>
+
+    <!-- باب الدخول -->
+    <div id="door-wrap" class="door-active">
+        <div class="door-panel door-left"></div>
+        <div class="door-panel door-right"></div>
+        <div id="door-center">
+            <img src="logo.jpg" alt="Karmel Logo" id="door-logo-img">
+            <p id="door-tagline">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر 🇪🇬</p>
+        </div>
+    </div>
+
+
+    <!-- الهيدر الموحد للموقع -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-icons">
+                <a href="cart.html" class="icon-link">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cart-count">0</span>
+                </a>
+                <a href="#" class="icon-link"><i class="fa-solid fa-magnifying-glass"></i></a>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html">الرئيسية</a>
+                <a href="#" onclick="goToCategory('natural'); return false;">المنتجات</a>
+                <a href="#" onclick="goToCategory('boxes'); return false;">البوكسات</a>
+                <a href="#" onclick="goToCategory('packages'); return false;">الباكجات</a>
+                <a href="#" onclick="goToCategory('oils'); return false;">الزيوت</a>
+            </nav>
+            <div class="logo">
+                <img src="logo.jpg" alt="Karmel Logo">
+            </div>
+        </div>
+    </header>
+
+    <div class="cart-page-container">
+        
+        <!-- قسم عرض المنتجات المضافة -->
+        <div class="cart-items-section">
+            <h2 style="color: #1b3c24; margin-top:0;">منتجاتك المختارة 🛒</h2>
+            <div id="cartItemsList">
+                <!-- المنتجات هتنزل هنا بالجافا سكريبت تلقائياً -->
+            </div>
+        </div>
+
+        <!-- قسم كاشير وتأكيد الطلب -->
+        <div class="checkout-section">
+            <h2>إتمام الطلب</h2>
+            <form id="checkoutForm" onsubmit="handleCheckout(event)">
+                <div class="form-group">
+                    <label for="custName">الاسم بالكامل:</label>
+                    <input type="text" id="custName" required placeholder="محمد أحمد">
+                </div>
+                <div class="form-group">
+                    <label for="custPhone">رقم التليفون:</label>
+                    <input type="tel" id="custPhone" required placeholder="01xxxxxxxxx" pattern="^01[0-9]{9}$" title="من فضلك اكتب رقم موبايل مصري صحيح (11 رقم يبدأ بـ 01)">
+                </div>
+                <div class="form-group">
+                    <label for="custGovernorate">المحافظة:</label>
+                    <select id="custGovernorate" required>
+                        <option value="" disabled selected>اختر المحافظة</option>
+                        <option value="القاهرة">القاهرة</option>
+                        <option value="الجيزة">الجيزة</option>
+                        <option value="القليوبية">القليوبية</option>
+                        <option value="الإسكندرية">الإسكندرية</option>
+                        <option value="البحيرة">البحيرة</option>
+                        <option value="مطروح">مطروح</option>
+                        <option value="الدقهلية">الدقهلية</option>
+                        <option value="دمياط">دمياط</option>
+                        <option value="الشرقية">الشرقية</option>
+                        <option value="بورسعيد">بورسعيد</option>
+                        <option value="الإسماعيلية">الإسماعيلية</option>
+                        <option value="السويس">السويس</option>
+                        <option value="شمال سيناء">شمال سيناء</option>
+                        <option value="جنوب سيناء">جنوب سيناء</option>
+                        <option value="كفر الشيخ">كفر الشيخ</option>
+                        <option value="الغربية">الغربية</option>
+                        <option value="المنوفية">المنوفية</option>
+                        <option value="بني سويف">بني سويف</option>
+                        <option value="الفيوم">الفيوم</option>
+                        <option value="المنيا">المنيا</option>
+                        <option value="أسيوط">أسيوط</option>
+                        <option value="سوهاج">سوهاج</option>
+                        <option value="قنا">قنا</option>
+                        <option value="الأقصر">الأقصر</option>
+                        <option value="أسوان">أسوان</option>
+                        <option value="البحر الأحمر">البحر الأحمر</option>
+                        <option value="الوادي الجديد">الوادي الجديد</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="custAddress">العنوان بالتفصيل:</label>
+                    <input type="text" id="custAddress" required placeholder="مدينة نصر - شارع...">
+                </div>
+
+                <div class="shipping-fee-box" id="shippingFeeBox">
+                    <span>رسوم الشحن (<span id="shippingGovName"></span>):</span>
+                    <span id="shippingFeeAmount">0 ج.م</span>
+                </div>
+
+                <div class="total-price-box">
+                    <span>الإجمالي الكلي:</span>
+                    <span id="cartTotalPrice">0 ج.م</span>
+                </div>
+
+                <button type="submit" class="submit-order-btn"> اضغط لتاكيد الطلب   </button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- الفوتر الموحد للموقع -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links-col">
+                <h4>تواصل معنا</h4>
+                <ul>
+                    <li><a href="tel:01501501466"><i class="fas fa-phone"></i> 01501501466</a></li>
+                    <li><a href="mailto:auriaegypt@gmail.com"><i class="fas fa-envelope"></i> auriaegypt@gmail.com</a></li>
+                    <li><a href="https://wa.me/201501501466" target="_blank"><i class="fab fa-whatsapp"></i> تواصل عبر واتساب</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>خدمة العملاء</h4>
+                <ul>
+                    <li><a href="policy.html?page=shipping">سياسة الشحن</a></li>
+                    <li><a href="policy.html?page=return">سياسة الاستبدال والاسترجاع</a></li>
+                    <li><a href="policy.html?page=privacy">سياسات الخصوصية</a></li>
+                    <li><a href="policy.html?page=terms">الشروط والأحكام</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>الأقسام</h4>
+                <ul>
+                    <li><a href="#" onclick="goToCategory('natural'); return false;">المنتجات</a></li>
+                    <li><a href="#" onclick="goToCategory('boxes'); return false;">البوكسات</a></li>
+                    <li><a href="#" onclick="goToCategory('packages'); return false;">الباكجات</a></li>
+                    <li><a href="#" onclick="goToCategory('oils'); return false;">الزيوت</a></li>
+                </ul>
+            </div>
+            <div class="footer-brand">
+                <img src="logo.jpg" alt="Auria Logo" class="footer-logo">
+                <p class="brand-desc">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر EG</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/200000000" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Karmel EGYPT – All Rights Reserved © 2026</p>
+        </div>
+    </footer>
+
+    <!-- ربط ملف الـ JS الرئيسي -->
+    <script src="door.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        // خريطة أسعار الشحن لكل محافظة (بتتحمل مرة واحدة من الفايربيز)
+        let shippingPricesMap = {};
+        let selectedShippingCost = 0;
+        let lastProductsTotal = 0;
+
+        async function loadShippingPricesForCustomer() {
+            try {
+                const response = await fetch(`${FIREBASE_DB_URL}shippingPrices.json`, { cache: 'no-store' });
+                const data = await response.json();
+                shippingPricesMap = data || {};
+            } catch (err) {
+                console.error('تعذر تحميل أسعار الشحن:', err);
+                shippingPricesMap = {};
+            }
+        }
+
+        // بيتنفذ أول ما العميل يختار محافظته من القايمة
+        function handleGovernorateChange() {
+            const gov = document.getElementById('custGovernorate').value;
+            selectedShippingCost = shippingPricesMap[gov] || 0;
+
+            const shippingBox = document.getElementById('shippingFeeBox');
+            const shippingAmountEl = document.getElementById('shippingFeeAmount');
+            const shippingGovNameEl = document.getElementById('shippingGovName');
+
+            if (gov) {
+                shippingBox.style.display = 'flex';
+                shippingGovNameEl.innerText = gov;
+                shippingAmountEl.innerText = `${selectedShippingCost} ج.م`;
+            } else {
+                shippingBox.style.display = 'none';
+            }
+
+            updateGrandTotalDisplay();
+        }
+
+        // بيحدث الإجمالي الكلي المعروض (منتجات + شحن) بدون إعادة رسم قائمة المنتجات
+        function updateGrandTotalDisplay() {
+            const totalContainer = document.getElementById('cartTotalPrice');
+            totalContainer.innerText = `${lastProductsTotal + selectedShippingCost} ج.م`;
+        }
+
+        // دالة لعرض المنتجات وحساب الإجمالي داخل الصفحة
+        function renderCartPage() {
+            const cart = getCart(); // الدالة دي من script.js
+            const listContainer = document.getElementById('cartItemsList');
+            
+            if (cart.length === 0) {
+                listContainer.innerHTML = '<div class="empty-cart-msg">سلتك فارغة حالياً.. املأها بالخيرات! 🌿</div>';
+                lastProductsTotal = 0;
+                updateGrandTotalDisplay();
+                return;
+            }
+
+            let listHTML = '';
+            let totalPrice = 0;
+
+            cart.forEach((item) => {
+                const itemTotal = item.price * item.quantity;
+                totalPrice += itemTotal;
+
+                listHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="cart-item-details">
+                            <h3>${item.name}</h3>
+                            <p>السعر: ${item.price} ج.م × ${item.quantity} = ${itemTotal} ج.م</p>
+                            <div class="cart-item-qty">
+                                <button class="cart-qty-btn" onclick="changeCartPageQty('${item.id}', -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="cart-qty-btn" onclick="changeCartPageQty('${item.id}', 1)">+</button>
+                            </div>
+                        </div>
+                        <button class="remove-btn" onclick="removeCartItem('${item.id}')">حذف</button>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = listHTML;
+            lastProductsTotal = totalPrice;
+            updateGrandTotalDisplay();
+        }
+
+        // تغيير الكمية من صفحة السلة نفسها
+        function changeCartPageQty(productId, delta) {
+            let cart = getCart();
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+            saveCart(cart);
+            renderCartPage();
+        }
+
+        // حذف منتج من السلة وإعادة التحديث
+        function removeCartItem(productId) {
+            let cart = getCart();
+            cart = cart.filter(item => item.id !== productId);
+            saveCart(cart);
+            renderCartPage();
+        }
+
+        // تشغيل الفورمة عند الضغط على زرار التأكيد
+        function handleCheckout(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const governorate = document.getElementById('custGovernorate').value;
+            const address = document.getElementById('custAddress').value;
+
+            sendOrderToWhatsApp(name, phone, address, governorate, selectedShippingCost);
+            renderCartPage(); // السلة بتتصفر بعد الإرسال، فبنحدث العرض
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCartPage();
+            loadShippingPricesForCustomer();
+            document.getElementById('custGovernorate').addEventListener('change', handleGovernorateChange);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmel Egypt - الرئيسية</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- أيقونات حوض البحث والسلة (FontAwesome كمثال) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="door.css">
+
+</head>
+<body>
+
+    <!-- باب الدخول -->
+    <div id="door-wrap" class="door-active">
+        <div class="door-panel door-left"></div>
+        <div class="door-panel door-right"></div>
+        <div id="door-center">
+            <img src="logo.jpg" alt="Karmel Logo" id="door-logo-img">
+            <p id="door-tagline">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر 🇪🇬</p>
+        </div>
+    </div>
+    
+    <!-- الهيدر ونظام التنقل -->
+<header class="main-header">
+    <div class="header-container">
+        <!-- 1. الأيقونات -->
+        <div class="header-icons">
+            <a href="#" class="icon-link" onclick="openMiniCart(); return false;">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span id="cart-count">0</span>
+            </a>
+            <a href="#" class="icon-link"><i class="fa-solid fa-magnifying-glass"></i></a>
+        </div>
+
+        <!-- 2. القائمة (تم تحويلها لشريط قابل للسحب) -->
+        <nav class="nav-menu" id="nav-menu">
+            <a href="#" onclick="goToCategory('natural'); return false;">المنتجات</a>
+            <a href="#" onclick="goToCategory('boxes'); return false;">البوكسات</a>
+            <a href="#" onclick="goToCategory('packages'); return false;">الباكجات</a>
+            <a href="#" onclick="goToCategory('oils'); return false;">الزيوت</a>  
+            <a href="policy.html?page=privacy">سياسات الخصوصية</a>
+            <a href="policy.html?page=return">سياسة الاستبدال والاسترجاع</a>
+            <a href="policy.html?page=shipping">سياسة الشحن</a>
+            <a href="policy.html?page=terms">الشروط والأحكام</a>
+        </nav>
+
+        <!-- 3. اللوجو -->
+     <!-- اللوجو والاسم معاً -->
+<div class="logo">
+    <img src="logo.jpg" alt="Karmel Logo">
+    <span class="logo-text">KARMEL</span>
+</div>
+    </div>
+</header>
+
+<!-- حاوي خارجي خلفيته بيضاء عشان يعمل الحواف البيضاء حول البانر -->
+<div style="background-color: #ffffff; padding: 20px 0; width: 100%;">
+    
+    <!-- البانر بمساحة محددة ومسنتر في النص -->
+    <section style="position: relative; width: 92%; max-width: 1200px; margin: 0 auto; aspect-ratio: 16/9; min-height: 250px; max-height: 450px; overflow: hidden; border-radius: 12px; background-color: #000; box-shadow: 0 8px 20px rgba(0,0,0,0.08);">
+        
+        <!-- الصورة بتعدل نفسها جوه الكارت -->
+        <img src="البانر.jpeg" alt="بانر كارميل" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+        
+        <!-- طبقة التغميق مع المحتوى -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.45); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 40px; z-index: 10;">
+            
+            <!-- كلمة KARMEL دهبية ومزخرفة فوق -->
+            <h1 style="color: #D4AF37; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: bold; text-transform: uppercase; letter-spacing: 4px; font-family: 'Playfair Display', serif; text-shadow: 2px 4px 12px rgba(0,0,0,0.7); margin: 0; text-align: center;">
+                KARMEL
+            </h1>
+
+            <!-- الجملة التسويقية بيضاء ومزخرفة تحتها -->
+            <p style="color: #ffffff; font-size: clamp(1rem, 2.8vw, 1.6rem); font-family: 'Amiri', serif; margin-top: 8px; text-shadow: 1px 2px 8px rgba(0,0,0,0.8); text-align: center; font-weight: 300; letter-spacing: 0.5px;">
+                لأن الجمال الحقيقي يبدأ بالعناية الطبيعية
+            </p>
+
+        </div>
+    </section>
+
+</div>
+    <!-- قسم الكروت (الأقسام الرئيسية) -->
+  <main class="categories-section">
+    <!-- تم تغيير الـ class هنا لربطه بسلايدر السحب -->
+    <div class="categories-slider-container">
+
+        <!-- كارت قسم البوكسات -->
+        <div class="category-card" onclick="goToCategory('boxes')">
+            <img id="category-card-img-boxes" src="تيست البوكسات.jpeg" alt="قسم البوكسات">
+            <div class="card-overlay">
+                <h2> </h2>
+                <button class="card-btn" id="category-card-btn-boxes">البوكسات</button>
+            </div>
+        </div>
+
+        <!-- كارت قسم المنتجات -->
+        <div class="category-card" onclick="goToCategory('natural')">
+            <img id="category-card-img-natural" src="تيست المنتجات.png" alt="قسم المنتجات">
+            <div class="card-overlay">
+                <h2> </h2>
+                <button class="card-btn" id="category-card-btn-natural">المنتجات</button>
+            </div>
+        </div>
+
+        <!-- كارت قسم الباكجات -->
+        <div class="category-card" onclick="goToCategory('packages')">
+            <img id="category-card-img-packages" src="تيست الباكدج.png" alt="قسم الباكجات">
+            <div class="card-overlay">
+                <h2> </h2>
+                <button class="card-btn" id="category-card-btn-packages">الباكجات</button>
+            </div>
+        </div>
+
+        <!-- كارت قسم الزيوت -->
+        <div class="category-card" onclick="goToCategory('oils')">
+            <img id="category-card-img-oils" src="تيست 2.jpeg" alt="قسم الزيوت">
+            <div class="card-overlay">
+                <h2> </h2>
+                <button class="card-btn" id="category-card-btn-oils">الزيوت</button>
+            </div>
+        </div>
+
+    </div>
+</main>
+    <!-- قسم البانر الإعلاني الرئيسي (Hero Banner) -->
+<section class="hero-banner-section">
+    <div class="banner-container">
+        <!-- حط هنا مسار صورة البانر بتاعتك، أو سيب الرابط الوهمي ده حالياً -->
+        <img src="بانر زيوت.jpeg" alt="مجموعة منتجات كارميل" class="banner-img">
+        
+        <!-- المحتوى اللي فوق الصورة لو حابب تكتبه كود مش صورة سادة -->
+        <div class="banner-overlay">
+            <div class="banner-text-content">
+                <span class="brand-sub-title">KARMEL Egypt</span>
+                <h1 class="main-banner-title">مجموعة زيوت كارميل</h1>
+                <p class="banner-desc">لأن الجمال الحقيقي يبدأ بالعناية الطبيعية</p>
+                <a href="category.html?type=oils" class="banner-cta-btn">اكتشفي المجموعة</a>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="products-wrapper">
+<!-- قسم زيوت طبيعية للعناية بالشعر والبشرة -->
+<section class="home-slider-section">
+    <h2 class="section-main-title">زيوت طبيعية للعناية بالشعر والبشرة</h2>
+    
+    <div class="slider-wrapper">
+        <!-- أسهم التنقل -->
+        <button class="slider-arrow prev-btn" onclick="moveSlider('oils-slider', -1)">&#10094;</button>
+        
+        <div class="slider-container" id="oils-slider">
+            <!-- 1. زيت الروزماري -->
+            <div class="home-product-card" onclick="goToDirectProduct('oils', 'o_rosemary')">
+                <span class="home-discount-badge">خصم 18%</span>
+                <img src="الزيوت.png" alt="زيت الروزماري" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">زيت الروزماري</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">550 ج.م</span>
+                        <span class="home-new-price">450 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('oils', 'o_rosemary', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 2. زيت الجوجوبا -->
+            <div class="home-product-card" onclick="goToDirectProduct('oils', 'o_jojoba')">
+                <span class="home-discount-badge">خصم 16%</span>
+                <img src="الزيوت.png" alt="زيت الجوجوبا" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">زيت الجوجوبا</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">250 ج.م</span>
+                        <span class="home-new-price">210 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('oils', 'o_jojoba', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 3. زيت اللوز الحلو -->
+            <div class="home-product-card" onclick="goToDirectProduct('oils', 'o_almond')">
+                <span class="home-discount-badge">خصم 8%</span>
+                <img src="الزيوت.png" alt="زيت اللوز الحلو" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">زيت اللوز الحلو</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">240 ج.م</span>
+                        <span class="home-new-price">220 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('oils', 'o_almond', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 4. زيت كارميل -->
+            <div class="home-product-card" onclick="goToDirectProduct('oils', 'o_karmel')">
+                <span class="home-discount-badge">خصم 19%</span>
+                <img src="الزيوت.png" alt="زيت كارميل" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">زيت كارميل</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">399 ج.م</span>
+                        <span class="home-new-price">325 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('oils', 'o_karmel', event)">إضافة للسلة</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="slider-arrow next-btn" onclick="moveSlider('oils-slider', 1)">&#10095;</button>
+    </div>
+</section>
+<section class="hero-banner-section">
+    <div class="banner-container">
+        <!-- حط هنا مسار صورة البانر بتاعتك، أو سيب الرابط الوهمي ده حالياً -->
+        <img src="بانر الباكدجات.jpeg" alt="مجموعة منتجات كارميل" class="banner-img">
+        
+        <!-- المحتوى اللي فوق الصورة لو حابب تكتبه كود مش صورة سادة -->
+        <div class="banner-overlay">
+            <div class="banner-text-content">
+                <span class="brand-sub-title">KARMEL Egypt</span>
+                <h1 class="main-banner-title">مجموعة بوكسات كارميل</h1>
+                <p class="banner-desc">لأن الجمال الحقيقي يبدأ بالعناية الطبيعية</p>
+                <a href="category.html?type=boxes" class="banner-cta-btn">اكتشفي المجموعة</a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- قسم بوكسات العناية بخصومات ضخمة -->
+<section class="home-slider-section">
+    <h2 class="section-main-title">بوكسات العناية بخصومات ضخمة</h2>
+    
+    <div class="slider-wrapper">
+        <!-- أسهم التنقل -->
+        <button class="slider-arrow prev-btn" onclick="moveSlider('boxes-slider', -1)">&#10094;</button>
+        
+        <div class="slider-container" id="boxes-slider">
+            <!-- 1. بوكس القوة الطبيعية -->
+            <div class="home-product-card" onclick="goToDirectProduct('boxes', 'b_power')">
+                <span class="home-discount-badge">خصم 17%</span>
+                <img src="البوكسات.png" alt="بوكس القوة الطبيعية" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">بوكس القوة الطبيعية</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">1199 ج.م</span>
+                        <span class="home-new-price">999 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('boxes', 'b_power', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 2. البوكس السحري للعناية بالشعر -->
+            <div class="home-product-card" onclick="goToDirectProduct('boxes', 'b_hair')">
+                <span class="home-discount-badge">خصم 21%</span>
+                <img src="البوكسات.png" alt="البوكس السحري للعناية بالشعر" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">البوكس السحري للعناية بالشعر</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">1700 ج.م</span>
+                        <span class="home-new-price">1349 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('boxes', 'b_hair', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 3. مجموعة كارميل المتكاملة -->
+            <div class="home-product-card" onclick="goToDirectProduct('boxes', 'b_karmel_full')">
+                <span class="home-discount-badge">خصم 20%</span>
+                <img src="البوكسات.png" alt="مجموعة كارميل المتكاملة" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">مجموعة كارميل المتكاملة</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">2500 ج.م</span>
+                        <span class="home-new-price">1999 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('boxes', 'b_karmel_full', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 4. بوكس التغذية الطبيعية -->
+            <div class="home-product-card" onclick="goToDirectProduct('boxes', 'b_nutrition')">
+                <span class="home-discount-badge">خصم 17%</span>
+                <img src="البوكسات.png" alt="بوكس التغذية الطبيعية" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">بوكس التغذية الطبيعية</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">1199 ج.م</span>
+                        <span class="home-new-price">999 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('boxes', 'b_nutrition', event)">إضافة للسلة</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="slider-arrow next-btn" onclick="moveSlider('boxes-slider', 1)">&#10095;</button>
+    </div>
+</section>
+<!-- قسم باكدجات العناية (تحت البوكسات مباشرة) -->
+ <section class="hero-banner-section">
+    <div class="banner-container">
+        <!-- حط هنا مسار صورة البانر بتاعتك، أو سيب الرابط الوهمي ده حالياً -->
+        <img src="بانر الباكدج.png" alt="مجموعة منتجات كارميل" class="banner-img">
+        
+        <!-- المحتوى اللي فوق الصورة لو حابب تكتبه كود مش صورة سادة -->
+        <div class="banner-overlay">
+            <div class="banner-text-content">
+                <span class="brand-sub-title">KARMEL Egypt</span>
+                <h1 class="main-banner-title">مجموعة باكدجات كارميل</h1>
+                <p class="banner-desc">لأن الجمال الحقيقي يبدأ بالعناية الطبيعية</p>
+                <a href="category.html?type=packages" class="banner-cta-btn">اكتشفي المجموعة</a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="home-slider-section">
+    <h2 class="section-main-title">باكدجات العناية</h2>
+    
+    <div class="slider-wrapper">
+        <!-- أسهم التنقل للكمبيوتر -->
+        <button class="slider-arrow prev-btn" onclick="moveSlider('packages-slider', -1)">&#10094;</button>
+        
+        <div class="slider-container" id="packages-slider">
+            
+            <!-- 1. باكج السدر ونواة التمر -->
+            <div class="home-product-card" onclick="goToDirectProduct('packages', 'p_sadr_tamer')">
+                <span class="home-discount-badge">خصم 8%</span>
+                <img src="1784463527232.png" alt="باكج السدر ونواة التمر" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">باكج السدر ونواة التمر</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">650 ج.م</span>
+                        <span class="home-new-price">599 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('packages', 'p_sadr_tamer', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 2. باكج السدر والمشاط -->
+            <div class="home-product-card" onclick="goToDirectProduct('packages', 'p_sadr_mashat')">
+                <span class="home-discount-badge">خصم 20%</span>
+                <img src="الباكدجات.jpeg" alt="باكج السدر والمشاط" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">باكج السدر والمشاط</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">1000 ج.م</span>
+                        <span class="home-new-price">799 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('packages', 'p_sadr_mashat', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 3. باكج السدر والمورينجا -->
+            <div class="home-product-card" onclick="goToDirectProduct('packages', 'p_sadr_moringa')">
+                <span class="home-discount-badge">خصم 8%</span>
+                <img src="الباكدجات.jpeg" alt="باكج السدر والمورينجا" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">باكج السدر والمورينجا</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">650 ج.م</span>
+                        <span class="home-new-price">599 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('packages', 'p_sadr_moringa', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+            <!-- 4. باكج السدر وحناء المدينة -->
+            <div class="home-product-card" onclick="goToDirectProduct('packages', 'p_sadr_henna')">
+                <span class="home-discount-badge">خصم 8%</span>
+                <img src="الباكدجات.jpeg" alt="باكج السدر وحناء المدينة" class="home-product-image">
+                <div class="home-product-info">
+                    <h3 class="home-product-name">باكج السدر وحناء المدينة</h3>
+                    <div class="home-product-prices">
+                        <span class="home-old-price">650 ج.م</span>
+                        <span class="home-new-price">599 ج.م</span>
+                    </div>
+                    <button class="cart-add-btn" onclick="addToCart('packages', 'p_sadr_henna', event)">إضافة للسلة</button>
+                </div>
+            </div>
+
+        </div>
+
+        <button class="slider-arrow next-btn" onclick="moveSlider('packages-slider', 1)">&#10095;</button>
+    </div>
+</section><!-- ق
+سم منتجات طبيعية لشعر صحي وطبيعي -->
+<section class="hero-banner-section">
+    <div class="banner-container">
+        <!-- حط هنا مسار صورة البانر بتاعتك، أو سيب الرابط الوهمي ده حالياً -->
+        <img src="bk2.jpg" alt="مجموعة منتجات كارميل" class="banner-img">
+        
+        <!-- المحتوى اللي فوق الصورة لو حابب تكتبه كود مش صورة سادة -->
+        <div class="banner-overlay">
+            <div class="banner-text-content">
+                <span class="brand-sub-title">KARMEL Egypt</span>
+                <h1 class="main-banner-title">مجموعة منتجات كارميل</h1>
+                <p class="banner-desc">لأن الجمال الحقيقي يبدأ بالعناية الطبيعية</p>
+                <a href="category.html?type=natural" class="banner-cta-btn">اكتشفي المجموعة</a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="natural-section">
+    <h2 class="section-title">منتجات طبيعية لشعر صحي وطبيعي</h2>
+    
+    <div class="natural-slider-container">
+        <!-- سهم اليمين -->
+        <button class="natural-arrow-btn right-arrow" onclick="moveSlider('naturalProductsSlider', -1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- حاوية السلايدر -->
+        <div class="natural-slider-wrapper" id="naturalProductsSlider">
+            
+            <!-- 1. كارت حناء المدينة -->
+            <div class="natural-card" onclick="goToDirectProduct('natural', 'prod_henna')">
+                <div class="natural-badge">خصم 17%</div>
+                <div class="natural-img-box">
+                    <img src="hena.jpg" alt="حناء بيور">
+                </div>
+                <h3 class="natural-title">حناء بيور</h3>
+                <div class="natural-price-box">
+                    <span class="nat-new-price">500 ج.م</span>
+                    <span class="nat-old-price">600 ج.م</span>
+                </div>
+                <button class="cart-add-btn" onclick="addToCart('natural', 'prod_henna', event)">إضافة للسلة 🛒</button>
+            </div>
+
+
+            <!-- 3. كارت مشاط بني -->
+            <div class="natural-card" onclick="goToDirectProduct('natural', 'prod_mashat_brown')">
+                <div class="natural-badge">خصم 21%</div>
+                <div class="natural-img-box">
+                    <img src="msh.jpg" alt="مشاط بني">
+                </div>
+                <h3 class="natural-title">مشاط الشعر</h3>
+                <div class="natural-price-box">
+                    <span class="nat-new-price">549 ج.م</span>
+                    <span class="nat-old-price">699 ج.م</span>
+                </div>
+                <button class="cart-add-btn" onclick="addToCart('natural', 'prod_mashat_brown', event)">إضافة للسلة</button>
+            </div>
+
+            <!-- 4. كارت سدر مطحون -->
+            <div class="natural-card" onclick="goToDirectProduct('natural', 'prod_sadr_pure')">
+                <div class="natural-badge">خصم 22%</div>
+                <div class="natural-img-box">
+                    <img src="mat.jpg" alt="سدر مطحون">
+                </div>
+                <h3 class="natural-title">سدر مطحون</h3>
+                <div class="natural-price-box">
+                    <span class="nat-new-price">349 ج.م</span>
+                    <span class="nat-old-price">450 ج.م</span>
+                </div>
+                <button class="cart-add-btn" onclick="addToCart('natural', 'prod_sadr_pure', event)">إضافة للسلة</button>
+            </div>
+
+            <!-- 5. كارت ماسك السدر -->
+            <div class="natural-card" onclick="goToDirectProduct('natural', 'prod_sadr_mask')">
+                <div class="natural-badge">خصم 17%</div>
+                <div class="natural-img-box">
+                    <img src="nawa.jpg" alt="ماسك السدر">
+                </div>
+                <h3 class="natural-title"> نواة التمر</h3>
+                <div class="natural-price-box">
+                    <span class="nat-new-price">499 ج.م</span>
+                    <span class="nat-old-price">599 ج.m</span>
+                </div>
+                <button class="cart-add-btn" onclick="addToCart('natural', 'prod_sadr_mask', event)">إضافة للسلة</button>
+            </div>
+
+        </div>
+        <!-- سهم الشمال -->
+        <button class="natural-arrow-btn left-arrow" onclick="moveSlider('naturalProductsSlider', 1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+</section>
+<footer>
+    <div class="footer-container">
+        
+        <!-- 1. عمود تواصل معنا -->
+        <div class="footer-links-col">
+            <h4>تواصل معنا</h4>
+            <ul>
+                <li><a href="tel:01501501466"><i class="fas fa-phone"></i> 01501501466</a></li>
+                <li><a href="mailto:auriaegypt@gmail.com"><i class="fas fa-envelope"></i> auriaegypt@gmail.com</a></li>
+                <li><a href="https://wa.me/201501501466" target="_blank"><i class="fab fa-whatsapp"></i> تواصل عبر واتساب</a></li>
+            </ul>
+        </div>
+
+        <!-- 2. عمود خدمة العملاء -->
+       <!-- عمود خدمة العملاء المطور -->
+<div class="footer-links-col">
+    <h4>خدمة العملاء</h4>
+    <ul>
+        <li><a href="policy.html?page=shipping">سياسة الشحن</a></li>
+        <li><a href="policy.html?page=return">سياسة الاستبدال والاسترجاع</a></li>
+        <li><a href="policy.html?page=privacy">سياسات الخصوصية</a></li>
+        <li><a href="policy.html?page=terms">الشروط والأحكام</a></li>
+    </ul>
+</div>
+        <!-- 3. عمود الأقسام -->
+        <div class="footer-links-col">
+            <h4>الأقسام</h4>
+            <ul>
+                <li><a href="#" onclick="goToCategory('natural'); return false;">المنتجات</a></li>
+                <li><a href="#" onclick="goToCategory('boxes'); return false;">البوكسات</a></li>
+                <li><a href="#" onclick="goToCategory('packages'); return false;">الباكجات</a></li>
+                <li><a href="#" onclick="goToCategory('oils'); return false;">الزيوت</a></li>
+            </ul>
+        </div>
+
+        <!-- 4. عمود اللوجو والبراند -->
+        <div class="footer-brand">
+            <img src="logo.jpg" alt="Auria Logo" class="footer-logo">
+            <p class="brand-desc">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر EG</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/201501501466" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- الحقوق تحت خالص -->
+    <div class="footer-bottom">
+        <p>Karmel EGYPT – All Rights Reserved © 2026</p>
+    </div>
+</footer>
+
+<script src="door.js"></script>
+<!-- Firebase SDK (نسخة compat: تعمل بـ script tag عادي) - لازم للتحديث اللحظي للأسعار بدون Refresh -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="script.js"></script>
+
+
+</body>
+</html>

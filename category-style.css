@@ -1,0 +1,380 @@
+/* ==========================================================================
+   1. تصفير حواف الصفحة بالكامل لمنع الفراغات الجانبية
+   ========================================================================== */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden; /* يمنع السكرول الأفقي */
+    background-color: #fdfbf7;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    color: #333;
+    direction: rtl; /* لضمان التنسيق العربي الصحيح */
+}
+
+/* ==========================================================================
+   2. تصميم الهيدر (يدعم الشريط السحاب للموبايل والمنيو العادي للكمبيوتر)
+   ========================================================================== */
+.main-header {
+    background-color: #0d3b1e; /* اللون الأخضر الغامق */
+    color: #ffffff;
+    padding: 15px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* الأيقونات */
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-icons .icon-link {
+    color: #ffffff;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.header-icons .icon-link:hover {
+    color: #c5a880; /* لون ذهبي خفيف */
+}
+
+/* شارة عدد السلة (Badge) */
+#cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #ff3b30;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 50%;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* المنيو للكمبيوتر */
+.nav-menu {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.3s;
+    white-space: nowrap;
+}
+
+.nav-menu a:hover {
+    color: #c5a880;
+}
+
+/* اللوجو */
+.logo img {
+    max-height: 50px;
+    display: block;
+}
+
+/* ==========================================================================
+   3. حاوية صفحة المنتجات الرئيسية (الكمبيوتر)
+   ========================================================================== */
+.products-page-container {
+    max-width: 1000px; /* ملمومة في المنتصف تماماً */
+    margin: 0 auto;
+    width: 75%;
+    padding: 40px 0;
+}
+
+/* بار العنوان والترتيب */
+.page-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.category-main-title {
+    font-size: 1.8rem;
+    color: #0d3b1e;
+    font-weight: bold;
+}
+
+#sort-select {
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+}
+
+/* شبكة المنتجات (الكمبيوتر) */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 25px;
+}
+
+/* ستايل كارت المنتج المطور */
+.product-card {
+    background-color: #ece6d3; /* الخلفية البيج الفاتحة للكارت */
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 15px;
+    transition: transform 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* شارة الخصم */
+.discount-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: #fff;
+    color: #0d3b1e;
+    border: 1px solid #0d3b1e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    z-index: 5;
+}
+
+/* صورة المنتج المحدثة (تمنع تمطيط الصور أو قص البرطمانات) */
+.product-image {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* جعل أبعاد الصورة مربعة تلقائياً لمظهر احترافي */
+    object-fit: contain; /* يضمن ظهور البرطمان كاملاً دون قص غطائه أو قاعدته */
+    padding: 10px; /* حشو داخلي يمنع التصاق حواف الصورة بأطراف الكارت */
+    background-color: #ece6d3; /* الحفاظ على نفس الخلفية البيج المريحة للعين */
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+}
+
+/* تفاصيل الكارت (الأسماء والأسعار) */
+.product-info {
+    text-align: center;
+    padding: 15px 10px;
+    width: 100%;
+}
+
+.product-name {
+    font-size: 1.1rem;
+    color: #0d3b1e;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.product-prices {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 0.9rem;
+}
+
+.new-price {
+    color: #0d3b1e;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* زر إضافة للسلة */
+.add-to-cart-btn {
+    background-color: #0d3b1e;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    width: 85%;
+    transition: background-color 0.3s;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #16532d;
+}
+
+/* ==========================================================================
+   4. التجاوب مع شاشات الموبايل (إجبار الاقتراب من الحواف والصفين المتجاورين)
+   ========================================================================== */
+@media (max-width: 900px) {
+    /* تجاوب الهيدر وشريط المنيو السحاب */
+    .main-header {
+        padding: 10px 15px;
+    }
+
+    .header-container {
+        flex-wrap: wrap;
+        row-gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo img {
+        width: 80px;
+    }
+
+    .logo {
+        order: 1;
+    }
+
+    .header-icons {
+        order: 2;
+        gap: 15px;
+    }
+
+    .nav-menu {
+        order: 3;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        position: static !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        gap: 15px !important;
+        padding: 10px 5px 3px 5px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: transparent !important;
+        scrollbar-width: none !important;
+    }
+
+    .nav-menu::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .nav-menu a {
+        font-size: 13px !important;
+        padding: 4px 8px !important;
+        flex: 0 0 auto !important;
+        color: #ffffff !important;
+    }
+
+    /* جعل صفحة المنتجات تلتصق بالكامل مع حافة الشاشة لتوفير العرض */
+    .products-page-container {
+        width: 100% !important;
+        padding: 20px 10px !important; /* مسافة أمان صغيرة جداً يميناً ويساراً */
+    }
+
+    .page-header-bar {
+        margin-bottom: 25px;
+        padding: 0 5px; /* موازاة البار مع حواف المنتجات */
+    }
+
+    .category-main-title {
+        font-size: 1.4rem; /* تصغير حجم العنوان ليناسب الموبايل */
+    }
+
+    #sort-select {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* إجبار شبكة المنتجات على البقاء كصفين (2 Columns) متقاربين لمظهر ممتاز */
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important; /* تقليل المسافة بين الكروت للاستفادة من المساحة */
+    }
+
+    /* كارت المنتج على الموبايل */
+    .product-card {
+        padding-bottom: 12px;
+        border-radius: 12px; /* حواف أنعم تتلاءم مع حجم الشاشة */
+    }
+
+    .product-image {
+        padding: 8px; /* تقليص الحشو للحفاظ على حجم برطمان المنتج كبيراً وواضحاً */
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .product-name {
+        font-size: 0.95rem; /* خط متناسب في مساحة الصفين */
+        margin-bottom: 8px;
+    }
+
+    .product-prices {
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+
+    .new-price {
+        font-size: 1.05rem;
+    }
+
+    .add-to-cart-btn {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        width: 90%; /* توسيع الزرار لسهولة الضغط عليه في الموبايل */
+    }
+}
+
+/* ==========================================================================
+   5. تجميد التصميم لشاشات الهواتف الأصغر من 500px ليبقى صفين متجاورين
+   ========================================================================== */
+@media (max-width: 500px) {
+    /* إلغاء تحويل المنتجات لعمود واحد طويل، وإجبارها على صفين متجاورين أنيقين */
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important; /* مسافة ضيقة وموزونة ومثالية للشاشات الصغيرة */
+    }
+}
+
+/* ==========================================================================
+   6. ميديا كويري الشاشات الكبيرة (تثبيت المنيو الأفقي للكمبيوتر)
+   ========================================================================== */
+@media (min-width: 769px) {
+    .nav-menu { 
+        display: flex !important; 
+        flex-direction: row !important; 
+        position: static !important;
+        background-color: transparent !important;
+        width: auto !important;
+        padding: 0 !important;
+    }
+}

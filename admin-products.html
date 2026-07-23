@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة بيانات المنتجات الشاملة - Karmel Egypt</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: #f4f2ec; color: #333; padding: 20px; }
+        
+        /* شاشة تسجيل الدخول */
+        .lock-screen {
+            position: fixed; inset: 0; background: linear-gradient(135deg, #0d3b1e, #1b3c24);
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
+        }
+        .login-box {
+            background: #fff; padding: 40px; border-radius: 16px; text-align: center;
+            max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .login-box i { font-size: 50px; color: #0d3b1e; margin-bottom: 15px; }
+        .login-box h2 { color: #0d3b1e; margin-bottom: 8px; font-size: 20px; }
+        .login-box input {
+            width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc;
+            border-radius: 8px; text-align: center; font-size: 16px; outline: none;
+        }
+        .login-box button {
+            width: 100%; padding: 12px; background: #0d3b1e; color: #fff;
+            border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+        .login-box button:hover { background: #16532d; }
+        
+        /* الحاوية الرئيسية */
+        .container { max-width: 1200px; margin: 0 auto; display: none; }
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #0d3b1e; color: #fff; padding: 20px; border-radius: 12px; margin-bottom: 25px;
+        }
+        header h1 { font-size: 20px; display: flex; align-items: center; gap: 10px; }
+        header a { color: #eae5c8; text-decoration: none; font-size: 13px; border: 1px solid #eae5c8; padding: 6px 12px; border-radius: 8px; }
+        
+        /* شريط الأدوات الذكي */
+        .toolbar-section {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fff; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e6e6e6; flex-wrap: wrap; gap: 15px;
+        }
+        .search-box-wrapper { position: relative; flex: 1; min-width: 250px; }
+        .search-box-wrapper input {
+            width: 100%; padding: 10px 40px 10px 15px; border: 1px solid #ccc;
+            border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;
+        }
+        .search-box-wrapper input:focus { border-color: #0d3b1e; }
+        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+        .stats-container { display: flex; gap: 15px; flex-wrap: wrap; }
+        .stat-item {
+            background: #f9f9f9; border: 1px solid #eee; padding: 6px 12px;
+            border-radius: 8px; display: flex; flex-direction: column; align-items: center; min-width: 80px;
+        }
+        .stat-num { font-size: 16px; font-weight: bold; color: #333; }
+        .stat-label { font-size: 10px; color: #666; }
+        .active-item { border-color: #a3e2ab; background: #f1fbf3; }
+        .active-item .stat-num { color: #2e7d32; }
+        .hidden-item { border-color: #ffcdd2; background: #ffebee; }
+        .hidden-item .stat-num { color: #c62828; }
+        .coming-item { border-color: #ffe082; background: #fff8e1; }
+        .coming-item .stat-num { color: #ef6c00; }
+
+        /* الأقسام والشبكة */
+        .category-block { margin-bottom: 45px; background: #faf9f5; padding: 20px; border-radius: 16px; border: 1px dashed #c5a880; }
+        .category-title { color: #0d3b1e; font-size: 18px; border-bottom: 3px solid #0d3b1e; padding-bottom: 8px; margin-bottom: 20px; }
+        
+        .products-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+        }
+        
+        /* كارت المنتج */
+        .product-edit-card {
+            background: #fff; border-radius: 14px; padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #e6e6e6;
+            display: flex; flex-direction: column; gap: 15px; position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .product-edit-card.state-hidden { opacity: 0.65; border: 1px dashed #c62828; background: #fafafa; }
+        .product-edit-card.state-coming_soon { border: 1px solid #ffb300; background: #fffdf9; }
+
+        .card-header {
+            display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #eee; padding-bottom: 10px; padding-left: 35px;
+        }
+        .card-header img { width: 55px; height: 55px; object-fit: contain; border-radius: 8px; background: #ece6d3; padding: 3px; }
+        .name-edit-input {
+            width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-weight: bold; color: #0d3b1e; font-size: 14px; outline: none;
+        }
+        .name-edit-input:focus { border-color: #0d3b1e; background: #fdfbf7; }
+        
+        .status-badge {
+            position: absolute; top: 18px; left: 60px; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 12px; display: flex; align-items: center; gap: 4px;
+        }
+        .badge-active { background-color: #eafaf1; color: #1b5e20; }
+        .badge-hidden { background-color: #fbe9e7; color: #c62828; }
+        .badge-coming { background-color: #fff8e1; color: #ef6c00; }
+
+        .status-selector {
+            display: flex; flex-direction: column; gap: 6px; margin-top: 5px; padding-top: 10px; border-top: 1px dashed #eee;
+        }
+        .status-label { font-size: 11px; color: #666; font-weight: bold; }
+        .status-buttons { display: flex; gap: 8px; }
+        .status-btn {
+            flex: 1; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px;
+            font-size: 12px; font-weight: bold; cursor: pointer; background: #fff;
+            color: #555; display: flex; align-items: center; justify-content: center; gap: 5px;
+            transition: all 0.2s ease;
+        }
+        .status-btn:hover { background: #f5f5f5; }
+        .status-btn.btn-active.selected { background-color: #eafaf1; color: #1b5e20; border-color: #2e7d32; }
+        .status-btn.btn-hidden.selected { background-color: #fbe9e7; color: #c62828; border-color: #d84315; }
+        .status-btn.btn-coming.selected { background-color: #fff8e1; color: #ef6c00; border-color: #f9a825; }
+
+        .fields-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        }
+        .input-group { display: flex; flex-direction: column; gap: 4px; }
+        .input-group label { font-size: 11px; color: #666; font-weight: bold; }
+        .input-group input, .input-group textarea {
+            padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none; width: 100%;
+        }
+        .input-group input:focus, .input-group textarea:focus { border-color: #0d3b1e; }
+        
+        .full-width { grid-column: span 3; }
+        textarea { resize: vertical; min-height: 80px; font-family: inherit; line-height: 1.4; }
+        
+        .image-upload-wrapper {
+            display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 5px;
+        }
+        .upload-btn-label {
+            background-color: #ece6d3; color: #0d3b1e; border: 1px solid #c5a880;
+            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: bold;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+            transition: background 0.2s;
+        }
+        .upload-btn-label:hover { background-color: #dfd8c2; }
+        .upload-hint { font-size: 11px; color: #777; }
+        
+        .delete-card-btn {
+            position: absolute; top: 18px; left: 18px;
+            background-color: #ffe5e5; color: #d81b1b; border: 1px solid #ffd1d1;
+            width: 32px; height: 32px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s; z-index: 10;
+        }
+        .delete-card-btn:hover { background-color: #d81b1b; color: #fff; }
+
+        .add-product-wrapper {
+            display: flex; justify-content: center; width: 100%; margin-top: 25px;
+        }
+        .add-product-btn {
+            background-color: #1b3c24; color: #fff; border: none; padding: 10px 24px;
+            border-radius: 25px; font-weight: bold; font-size: 13.5px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: background 0.2s;
+        }
+        .add-product-btn:hover { background-color: #0d3b1e; }
+        
+        .save-bar {
+            position: sticky; bottom: 20px; background: #fff; padding: 15px 25px;
+            border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+            flex-wrap: wrap; gap: 15px; margin-top: 25px;
+        }
+        .save-btn {
+            background: #0d3b1e; color: #fff; border: none; padding: 12px 30px;
+            border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: background 0.2s;
+        }
+        .save-btn:hover { background: #16532d; }
+        
+        @media (max-width: 900px) {
+            .products-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 500px) {
+            .fields-row { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+        }
+        /* ===== القائمة الجانبية الجديدة ===== */
+        .admin-layout { display: flex; align-items: flex-start; gap: 25px; }
+
+        .admin-sidebar {
+            flex: 0 0 220px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: right;
+            background: none;
+            border: none;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #444;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar-item:hover { background: #f4f2ec; }
+        .sidebar-item.active { background: #0d3b1e; color: #fff; }
+        .sidebar-item i { width: 18px; text-align: center; }
+
+        .sidebar-divider { height: 1px; background: #eee; margin: 8px 4px; }
+
+        .admin-content { flex: 1; min-width: 0; }
+
+        .admin-view { display: none; }
+        .admin-view.active-view { display: block; }
+
+        .view-title {
+            color: #0d3b1e;
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ===== شاشة أسعار الشحن ===== */
+        .shipping-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 25px;
+        }
+        .shipping-row {
+            background: #fff; border: 1px solid #e6e6e6; border-radius: 10px;
+            padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        }
+        .shipping-row span { font-size: 13.5px; font-weight: bold; color: #333; }
+        .shipping-row input {
+            width: 90px; padding: 8px; border: 1px solid #ccc; border-radius: 6px;
+            font-size: 13px; text-align: center; outline: none;
+        }
+        .shipping-row input:focus { border-color: #0d3b1e; }
+        .shipping-save-wrapper { display: flex; justify-content: flex-end; }
+        @media (max-width: 900px) {
+            .shipping-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 550px) {
+            .shipping-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ===== شاشة بيانات الحاويات (كروت الأقسام في الصفحة الرئيسية) ===== */
+        .containers-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-bottom: 25px;
+        }
+        .container-edit-card {
+            background: #fff; border: 1px solid #e6e6e6; border-radius: 12px; padding: 16px;
+        }
+        .container-edit-card .container-preview-wrap {
+            position: relative; width: 100%; height: 160px; border-radius: 10px; overflow: hidden;
+            background: #ece6d3; margin-bottom: 12px;
+        }
+        .container-edit-card .container-preview-wrap img {
+            width: 100%; height: 100%; object-fit: contain;
+        }
+        .container-edit-card label {
+            display: block; font-size: 12.5px; font-weight: bold; color: #333; margin-bottom: 5px;
+        }
+        .container-edit-card input[type="text"] {
+            width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 7px;
+            font-size: 13px; outline: none; margin-bottom: 10px; box-sizing: border-box;
+        }
+        .container-edit-card input[type="text"]:focus { border-color: #0d3b1e; }
+        .container-upload-btn {
+            width: 100%; padding: 9px; border: 1px dashed #0d3b1e; background: #f4f2ec;
+            color: #0d3b1e; border-radius: 7px; font-size: 12.5px; font-weight: bold;
+            cursor: pointer; text-align: center;
+        }
+        .container-upload-btn:hover { background: #eae6da; }
+        .containers-save-wrapper { display: flex; justify-content: flex-end; }
+        @media (max-width: 700px) {
+            .containers-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ===== شاشة الإحصائيات ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-right: 4px solid #0d3b1e;
+        }
+        .stat-card.stat-hidden-card { border-right-color: #c0392b; }
+        .stat-card.stat-coming-card { border-right-color: #b8860b; }
+        .stat-card .stat-card-num { font-size: 28px; font-weight: bold; color: #0d3b1e; display: block; }
+        .stat-card .stat-card-label { font-size: 13px; color: #777; margin-top: 4px; }
+
+        .category-breakdown {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .category-breakdown h3 { color: #0d3b1e; font-size: 16px; margin-bottom: 14px; }
+        .cat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            color: #444;
+        }
+        .cat-row:last-child { border-bottom: none; }
+        .cat-row-count { font-weight: bold; color: #0d3b1e; }
+
+        @media (max-width: 900px) {
+            .admin-layout { flex-direction: column; }
+            .admin-sidebar {
+                position: static;
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                flex: none;
+            }
+            .sidebar-item { white-space: nowrap; }
+        }
+
+        /* ===== مودال تغيير بيانات الحساب ===== */
+        .account-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .account-modal-overlay.active { opacity: 1; pointer-events: all; }
+        .account-modal {
+            background: #fff;
+            border-radius: 14px;
+            max-width: 420px;
+            width: 100%;
+            padding: 25px;
+            position: relative;
+        }
+        .account-modal .modal-close-btn {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: #f0f0f0;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lock-screen" class="lock-screen">
+        <form class="login-box" onsubmit="loginAdmin(event)">
+            <i class="fa-solid fa-user-gear"></i>
+            <h2>تعديل بيانات المنتجات الشامل</h2>
+            <p style="color: #777; font-size: 13px; margin-top: 5px;">سجل دخول الأدمن للمتابعة</p>
+            <input type="email" id="email-input" placeholder="البريد الإلكتروني" required autocomplete="username">
+            <input type="password" id="pass-input" placeholder="كلمة المرور" required autocomplete="current-password">
+            <p id="error-msg" style="color: #d81b1b; font-size: 13px; margin-bottom: 10px;"></p>
+            <button type="submit">دخول</button>
+        </form>
+    </div>
+
+    <div id="admin-container" class="container">
+        <header>
+            <h1><i class="fa-solid fa-pen-to-square"></i> إدارة البيانات والصور والأسعار</h1>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="admin.html"><i class="fa-solid fa-receipt"></i> لوحة الأوردرات</a>
+                <a href="#" onclick="openAccountSettingsModal(); return false;"><i class="fa-solid fa-user-gear"></i> بيانات الحساب</a>
+                <a href="#" onclick="handleProductsAdminLogout(); return false;"><i class="fa-solid fa-right-from-bracket"></i> تسجيل خروج</a>
+            </div>
+        </header>
+
+        <div class="admin-layout">
+            <aside class="admin-sidebar">
+                <button class="sidebar-item active" id="sidebar-btn-home" onclick="switchAdminView('home')">
+                    <i class="fa-solid fa-house"></i> الرئيسية
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="sidebar-item" id="sidebar-btn-natural" onclick="switchAdminView('natural')">
+                    <i class="fa-solid fa-leaf"></i> طبيعية
+                </button>
+                <button class="sidebar-item" id="sidebar-btn-boxes" onclick="switchAdminView('boxes')">
+                    <i class="fa-solid fa-box-open"></i> بوكسات
+                </button>
+                <button class="sidebar-item" id="sidebar-btn-packages" onclick="switchAdminView('packages')">
+                    <i class="fa-solid fa-gift"></i> باكجات
+                </button>
+                <button class="sidebar-item" id="sidebar-btn-oils" onclick="switchAdminView('oils')">
+                    <i class="fa-solid fa-droplet"></i> زيوت
+                </button>
+                <div class="sidebar-divider"></div>
+                <button class="sidebar-item" id="sidebar-btn-containers" onclick="switchAdminView('containers')">
+                    <i class="fa-solid fa-images"></i> بيانات الحاويات
+                </button>
+                <button class="sidebar-item" id="sidebar-btn-shipping" onclick="switchAdminView('shipping')">
+                    <i class="fa-solid fa-truck-fast"></i> تحديث أسعار الشحن
+                </button>
+            </aside>
+
+            <main class="admin-content">
+                <!-- شاشة الإحصائيات -->
+                <div id="view-home" class="admin-view active-view">
+                    <h2 class="view-title"><i class="fa-solid fa-chart-line"></i> نظرة عامة</h2>
+                    <div class="stats-grid" id="stats-grid-home"></div>
+                    <div class="category-breakdown" id="category-breakdown-home"></div>
+                </div>
+
+                <!-- شاشة عرض وتعديل منتجات القسم المختار -->
+                <div id="view-products" class="admin-view">
+                    <div class="toolbar-section">
+                        <div class="search-box-wrapper">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="admin-search-input" placeholder="البحث عن منتج بالاسم..." oninput="filterProducts(this.value)">
+                        </div>
+                    </div>
+                    <div id="categories-wrapper"></div>
+                </div>
+
+                <!-- شاشة تحديث أسعار الشحن لكل محافظات مصر -->
+                <div id="view-shipping" class="admin-view">
+                    <h2 class="view-title"><i class="fa-solid fa-truck-fast"></i> تحديث أسعار الشحن</h2>
+                    <p style="color:#666; font-size:13px; margin-bottom:20px;">حدد سعر الشحن الخاص بكل محافظة، ثم اضغط "رفع التعديلات" بالأسفل لتحديثها في الموقع مباشرة.</p>
+                    <div id="shipping-grid" class="shipping-grid"></div>
+                    <div class="shipping-save-wrapper">
+                        <button class="save-btn" onclick="saveShippingPrices()"><i class="fa-solid fa-cloud-arrow-up"></i> رفع التعديلات</button>
+                    </div>
+                </div>
+
+                <!-- شاشة تعديل بيانات كروت الأقسام في الصفحة الرئيسية (الحاويات) -->
+                <div id="view-containers" class="admin-view">
+                    <h2 class="view-title"><i class="fa-solid fa-images"></i> بيانات الحاويات</h2>
+                    <p style="color:#666; font-size:13px; margin-bottom:20px;">عدّل صورة ونص كل كارت من كروت الأقسام الظاهرة في الصفحة الرئيسية، ثم اضغط "رفع التعديلات" لتحديثها فوراً أمام العملاء.</p>
+                    <div id="containers-grid" class="containers-grid"></div>
+                    <div class="containers-save-wrapper">
+                        <button class="save-btn" onclick="saveCategoryCards()"><i class="fa-solid fa-cloud-arrow-up"></i> رفع التعديلات</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="save-bar" id="main-save-bar">
+            <span style="font-size: 13px; color: #666;"><i class="fa-solid fa-circle-info"></i> أي تعديل تحفظه سيقوم بتحديث الأسعار فوراً أمام جميع العملاء.</span>
+            <button class="save-btn" onclick="saveAllProducts()"><i class="fa-solid fa-cloud-arrow-up"></i> حفظ ونشر التعديلات</button>
+        </div>
+    </div>
+
+    <!-- مودال تغيير بيانات الحساب (الإيميل / الباسورد) -->
+    <div class="account-modal-overlay" id="account-modal-overlay" onclick="closeAccountSettingsModal()">
+        <div class="account-modal" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeAccountSettingsModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="color:#0d3b1e; margin-bottom:6px;"><i class="fa-solid fa-user-gear"></i> تغيير بيانات الحساب</h2>
+            <p style="color:#999; font-size:13px; margin-bottom:18px;">الحساب الحالي: <strong id="account-current-email">-</strong></p>
+
+            <form onsubmit="submitAccountSettings(event)" style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                    <label style="font-size:13px; font-weight:bold; color:#333; display:block; margin-bottom:5px;">كلمة المرور الحالية (للتأكيد)</label>
+                    <input type="password" id="account-current-password" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                </div>
+                <div>
+                    <label style="font-size:13px; font-weight:bold; color:#333; display:block; margin-bottom:5px;">إيميل جديد (سيبها فاضية لو مش عايز تغيّره)</label>
+                    <input type="email" id="account-new-email" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                </div>
+                <div>
+                    <label style="font-size:13px; font-weight:bold; color:#333; display:block; margin-bottom:5px;">باسورد جديد (سيبها فاضية لو مش عايز تغيّره)</label>
+                    <input type="password" id="account-new-password" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                </div>
+                <div>
+                    <label style="font-size:13px; font-weight:bold; color:#333; display:block; margin-bottom:5px;">تأكيد الباسورد الجديد</label>
+                    <input type="password" id="account-new-password-confirm" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                </div>
+                <p id="account-settings-message" style="font-size:13px; min-height:18px;"></p>
+                <button type="submit" style="background:#0d3b1e; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">حفظ التعديلات</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (نسخة compat: تعمل بـ <script> عادي بدون أي build tool) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="firebase-auth.js"></script>
+
+    <script src="script.js"></script>
+    <script>
+        // UID الحساب المسموح له بدخول لوحة الأسعار/المنتجات (حساب صاحب المعرض بس)
+        const PRODUCTS_ALLOWED_UID = 'oeyrrwzSIxbcLE3Ti1ZHVHyG1RU2';
+
+        let localProductsCopy = {};
+        let searchQuery = "";
+
+        async function loginAdmin(e) {
+            e.preventDefault();
+            const email = document.getElementById("email-input").value;
+            const password = document.getElementById("pass-input").value;
+            const errorEl = document.getElementById("error-msg");
+            errorEl.textContent = "";
+
+            try {
+                await adminSignIn(email, password);
+                // showAdminPanel() هتتنفذ تلقائياً عن طريق watchAdminAuthState
+            } catch (error) {
+                errorEl.textContent = "بيانات الدخول غير صحيحة، حاول مجدداً.";
+                console.error("Admin login failed:", error.code);
+            }
+        }
+
+        function checkAuth() {
+            watchAdminAuthState((user) => {
+                if (user && user.uid === PRODUCTS_ALLOWED_UID) {
+                    showAdminPanel();
+                } else if (user) {
+                    // حساب مسجل دخول فعلاً بس مش صاحب صلاحية الصفحة دي (زي حساب الكول سنتر بالغلط)
+                    adminSignOut();
+                    alert('الحساب ده مش عنده صلاحية الدخول لصفحة الأسعار والمنتجات.');
+                } else {
+                    document.getElementById("lock-screen").style.display = "flex";
+                    document.getElementById("admin-container").style.display = "none";
+                }
+            });
+        }
+
+        async function handleProductsAdminLogout() {
+            await adminSignOut();
+        }
+
+        /* ===== مودال تغيير بيانات الحساب (إيميل / باسورد ذاتياً) ===== */
+
+        function openAccountSettingsModal() {
+            document.getElementById('account-current-email').textContent = getCurrentAdminEmail() || '-';
+            document.getElementById('account-current-password').value = '';
+            document.getElementById('account-new-email').value = '';
+            document.getElementById('account-new-password').value = '';
+            document.getElementById('account-new-password-confirm').value = '';
+            document.getElementById('account-settings-message').textContent = '';
+            document.getElementById('account-settings-message').style.color = '#d81b1b';
+            document.getElementById('account-modal-overlay').classList.add('active');
+        }
+
+        function closeAccountSettingsModal() {
+            document.getElementById('account-modal-overlay').classList.remove('active');
+        }
+
+        async function submitAccountSettings(event) {
+            event.preventDefault();
+            const messageEl = document.getElementById('account-settings-message');
+            messageEl.style.color = '#d81b1b';
+            messageEl.textContent = '';
+
+            const currentPassword = document.getElementById('account-current-password').value;
+            const newEmail = document.getElementById('account-new-email').value.trim();
+            const newPassword = document.getElementById('account-new-password').value;
+            const newPasswordConfirm = document.getElementById('account-new-password-confirm').value;
+
+            if (!newEmail && !newPassword) {
+                messageEl.textContent = 'محتاج تدخل إيميل جديد أو باسورد جديد على الأقل.';
+                return;
+            }
+            if (newPassword && newPassword !== newPasswordConfirm) {
+                messageEl.textContent = 'الباسورد الجديد وتأكيده مش متطابقين.';
+                return;
+            }
+
+            try {
+                await reauthenticateAdmin(currentPassword);
+                if (newEmail) await changeAdminEmail(newEmail);
+                if (newPassword) await changeAdminPassword(newPassword);
+
+                messageEl.style.color = '#0d3b1e';
+                messageEl.textContent = 'تم تحديث بيانات الحساب بنجاح! ✅';
+                document.getElementById('account-current-email').textContent = getCurrentAdminEmail() || '-';
+                setTimeout(closeAccountSettingsModal, 1800);
+            } catch (error) {
+                if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    messageEl.textContent = 'كلمة المرور الحالية غلط.';
+                } else if (error.code === 'auth/email-already-in-use') {
+                    messageEl.textContent = 'الإيميل ده مستخدم بالفعل في حساب تاني.';
+                } else if (error.code === 'auth/weak-password') {
+                    messageEl.textContent = 'الباسورد الجديد ضعيف، اختر باسورد أقوى (6 حروف على الأقل).';
+                } else if (error.code === 'auth/invalid-email') {
+                    messageEl.textContent = 'صيغة الإيميل الجديد غير صحيحة.';
+                } else {
+                    messageEl.textContent = 'حدث خطأ غير متوقع، حاول تاني.';
+                    console.error('Account settings update failed:', error);
+                }
+            }
+        }
+
+        async function showAdminPanel() {
+            document.getElementById("lock-screen").style.display = "none";
+            document.getElementById("admin-container").style.display = "block";
+            await loadProductsFromServer();
+            await loadShippingPricesFromServer();
+            await loadCategoryCardsFromServer();
+            switchAdminView('home');
+        }
+
+        async function loadProductsFromServer() {
+            try {
+                const response = await fetch(`${FIREBASE_DB_URL}products.json`);
+                const data = await response.json();
+                
+                if (data) {
+                    localProductsCopy = data;
+                } else {
+                    localProductsCopy = allProductsMasterData;
+                }
+                renderProductsList();
+            } catch (err) {
+                alert("تعذر الاتصال بقاعدة البيانات السحابية، تم استخدام النسخة الاحتياطية.");
+                localProductsCopy = allProductsMasterData;
+                renderProductsList();
+            }
+        }
+
+        let currentAdminView = 'home'; // 'home' أو مفتاح قسم زي natural, boxes, packages, oils أو 'shipping'
+
+        // كل محافظات مصر الـ 27 (نفس القائمة المستخدمة في فورم العميل بالظبط)
+        const EGYPT_GOVERNORATES = [
+            "القاهرة", "الجيزة", "القليوبية", "الإسكندرية", "البحيرة", "مطروح",
+            "الدقهلية", "دمياط", "الشرقية", "بورسعيد", "الإسماعيلية", "السويس",
+            "شمال سيناء", "جنوب سيناء", "كفر الشيخ", "الغربية", "المنوفية",
+            "بني سويف", "الفيوم", "المنيا", "أسيوط", "سوهاج", "قنا",
+            "الأقصر", "أسوان", "البحر الأحمر", "الوادي الجديد"
+        ];
+
+        let localShippingPrices = {};
+
+        async function loadShippingPricesFromServer() {
+            try {
+                const response = await fetch(`${FIREBASE_DB_URL}shippingPrices.json`, { cache: 'no-store' });
+                const data = await response.json();
+                localShippingPrices = data || {};
+            } catch (err) {
+                console.error("تعذر تحميل أسعار الشحن:", err);
+                localShippingPrices = {};
+            }
+            // أي محافظة مش موجودة لسه في القاعدة بتتحط بسعر 0 افتراضياً
+            EGYPT_GOVERNORATES.forEach(gov => {
+                if (typeof localShippingPrices[gov] !== 'number') {
+                    localShippingPrices[gov] = 0;
+                }
+            });
+        }
+
+        function renderShippingList() {
+            const grid = document.getElementById('shipping-grid');
+            grid.innerHTML = EGYPT_GOVERNORATES.map(gov => `
+                <div class="shipping-row">
+                    <span>${gov}</span>
+                    <input type="number" min="0" value="${localShippingPrices[gov] ?? 0}"
+                        onchange="updateShippingValue('${gov}', this.value)">
+                </div>
+            `).join('');
+        }
+
+        function updateShippingValue(gov, value) {
+            const num = parseFloat(value);
+            localShippingPrices[gov] = isNaN(num) || num < 0 ? 0 : num;
+        }
+
+        async function saveShippingPrices() {
+            try {
+                const authQuery = await buildAdminAuthQuery();
+                const response = await fetch(`${FIREBASE_DB_URL}shippingPrices.json${authQuery}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(localShippingPrices)
+                });
+
+                if (response.ok) {
+                    alert("تم تحديث أسعار الشحن بنجاح! 🎉");
+                } else {
+                    alert("عذراً، فشل تحديث أسعار الشحن. تأكد إنك مسجل دخول كأدمن.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ غير متوقع أثناء الاتصال بقاعدة البيانات.");
+            }
+        }
+
+        /* ===== بيانات الحاويات (كروت الأقسام في الصفحة الرئيسية) ===== */
+
+        // نفس الصور والنصوص المكتوبة حالياً في index.html، بتُستخدم كقيمة افتراضية
+        // أول مرة قبل ما يتم حفظ أي تعديل من هنا على Firebase
+        const DEFAULT_CATEGORY_CARDS = {
+            boxes:    { image: "تيست البوكسات.jpeg",   label: "البوكسات" },
+            natural:  { image: "تيست المنتجات.png",     label: "المنتجات" },
+            packages: { image: "تيست الباكدج.png",      label: "الباكجات" },
+            oils:     { image: "تيست 2.jpeg",           label: "الزيوت"  }
+        };
+
+        let localCategoryCards = {};
+
+        async function loadCategoryCardsFromServer() {
+            try {
+                const response = await fetch(`${FIREBASE_DB_URL}categoryCards.json`, { cache: 'no-store' });
+                const data = await response.json();
+                localCategoryCards = data || {};
+            } catch (err) {
+                console.error("تعذر تحميل بيانات الحاويات:", err);
+                localCategoryCards = {};
+            }
+            // أي قسم مش موجود لسه في القاعدة بياخد القيمة الافتراضية الحالية
+            Object.keys(DEFAULT_CATEGORY_CARDS).forEach(catKey => {
+                if (!localCategoryCards[catKey]) {
+                    localCategoryCards[catKey] = { ...DEFAULT_CATEGORY_CARDS[catKey] };
+                }
+            });
+        }
+
+        function renderContainersList() {
+            const grid = document.getElementById('containers-grid');
+            const catKeys = Object.keys(DEFAULT_CATEGORY_CARDS);
+
+            grid.innerHTML = catKeys.map(catKey => {
+                const card = localCategoryCards[catKey] || DEFAULT_CATEGORY_CARDS[catKey];
+                const previewId = `container-preview-${catKey}`;
+                return `
+                    <div class="container-edit-card">
+                        <div class="container-preview-wrap">
+                            <img id="${previewId}" src="${card.image}" alt="${card.label}">
+                        </div>
+                        <label>نص الزرار</label>
+                        <input type="text" value="${card.label}" onchange="updateContainerText('${catKey}', this.value)">
+                        <label>الصورة</label>
+                        <input type="file" accept="image/*" style="display:none" id="container-file-${catKey}"
+                            onchange="uploadContainerImage('${catKey}', this, '${previewId}')">
+                        <button type="button" class="container-upload-btn" onclick="document.getElementById('container-file-${catKey}').click()">
+                            <i class="fa-solid fa-upload"></i> اختر صورة جديدة
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateContainerText(catKey, value) {
+            if (!localCategoryCards[catKey]) {
+                localCategoryCards[catKey] = { ...DEFAULT_CATEGORY_CARDS[catKey] };
+            }
+            localCategoryCards[catKey].label = value;
+        }
+
+        async function uploadContainerImage(catKey, inputElement, imgPreviewId) {
+            const file = inputElement.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 5 ميجابايت.");
+                inputElement.value = "";
+                return;
+            }
+
+            const previewImg = document.getElementById(imgPreviewId);
+            const originalSrc = previewImg.src;
+            previewImg.style.opacity = "0.4"; // مؤشر بسيط إن الرفع شغال
+
+            try {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: "POST",
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (!response.ok || !result.secure_url) {
+                    throw new Error((result.error && result.error.message) || "فشل الرفع لسبب غير معروف");
+                }
+
+                if (!localCategoryCards[catKey]) {
+                    localCategoryCards[catKey] = { ...DEFAULT_CATEGORY_CARDS[catKey] };
+                }
+                localCategoryCards[catKey].image = result.secure_url;
+                previewImg.src = result.secure_url;
+            } catch (error) {
+                console.error("خطأ في رفع الصورة على Cloudinary:", error);
+                alert("فشل رفع الصورة، حاول تاني. (" + error.message + ")");
+                previewImg.src = originalSrc;
+            } finally {
+                previewImg.style.opacity = "1";
+                inputElement.value = "";
+            }
+        }
+
+        async function saveCategoryCards() {
+            try {
+                const authQuery = await buildAdminAuthQuery();
+                const response = await fetch(`${FIREBASE_DB_URL}categoryCards.json${authQuery}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(localCategoryCards)
+                });
+
+                if (response.ok) {
+                    alert("تم تحديث بيانات الحاويات بنجاح! 🎉");
+                } else {
+                    alert("عذراً، فشل تحديث البيانات. تأكد إنك مسجل دخول كأدمن.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ غير متوقع أثناء الاتصال بقاعدة البيانات.");
+            }
+        }
+
+        function switchAdminView(viewName) {
+            currentAdminView = viewName;
+
+            document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`sidebar-btn-${viewName}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            document.getElementById('view-home').classList.remove('active-view');
+            document.getElementById('view-products').classList.remove('active-view');
+            document.getElementById('view-shipping').classList.remove('active-view');
+            document.getElementById('view-containers').classList.remove('active-view');
+
+            const mainSaveBar = document.getElementById('main-save-bar');
+
+            if (viewName === 'home') {
+                document.getElementById('view-home').classList.add('active-view');
+                mainSaveBar.style.display = 'none';
+                updateStats();
+            } else if (viewName === 'shipping') {
+                document.getElementById('view-shipping').classList.add('active-view');
+                mainSaveBar.style.display = 'none';
+                renderShippingList();
+            } else if (viewName === 'containers') {
+                document.getElementById('view-containers').classList.add('active-view');
+                mainSaveBar.style.display = 'none';
+                renderContainersList();
+            } else {
+                document.getElementById('view-products').classList.add('active-view');
+                mainSaveBar.style.display = 'flex';
+                renderProductsList();
+            }
+        }
+
+        function renderProductsList() {
+            const wrapper = document.getElementById("categories-wrapper");
+            wrapper.innerHTML = "";
+
+            // لو الشاشة الحالية هي الرئيسية، منعرضش أي كروت منتجات هنا خالص
+            const targetKeys = (currentAdminView !== 'home' && localProductsCopy[currentAdminView]) ? [currentAdminView] : [];
+
+            targetKeys.forEach(catKey => {
+                const category = localProductsCopy[catKey];
+                
+                let cardsHTML = "";
+                category.items.forEach((item, index) => {
+                    let currentStatus = item.status || 'active';
+                    if (item.hidden === true) currentStatus = 'hidden';
+                    else if (item.comingSoon === true) currentStatus = 'coming_soon';
+
+                    let badgeHTML = '';
+                    if (currentStatus === 'active') {
+                        badgeHTML = '<span class="status-badge badge-active"><i class="fa-solid fa-circle-check"></i> نشط ومتاح</span>';
+                    } else if (currentStatus === 'hidden') {
+                        badgeHTML = '<span class="status-badge badge-hidden"><i class="fa-solid fa-eye-slash"></i> مخفي من الموقع</span>';
+                    } else if (currentStatus === 'coming_soon') {
+                        badgeHTML = '<span class="status-badge badge-coming"><i class="fa-solid fa-clock"></i> سيتوفر قريباً</span>';
+                    }
+
+                    let componentsFieldHTML = "";
+                    if (catKey === 'packages') {
+                        componentsFieldHTML = `
+                            <div class="input-group full-width">
+                                <label style="color: #7d653f;"><i class="fa-solid fa-cubes"></i> مكونات الباكج (اكتب كل عنصر في سطر جديد)</label>
+                                <textarea placeholder="- سدر نقي\n- زيت الروزماري" onchange="updateValue('${catKey}', ${index}, 'components', this.value)">${item.components || ''}</textarea>
+                            </div>
+                        `;
+                    } else if (catKey === 'boxes') {
+                        componentsFieldHTML = `
+                            <div class="input-group full-width">
+                                <label style="color: #7d653f;"><i class="fa-solid fa-box-open"></i> مكونات البوكس (اكتب كل عنصر في سطر جديد)</label>
+                                <textarea placeholder="- شامبو مغذي\n- بلسم مرطب" onchange="updateValue('${catKey}', ${index}, 'components', this.value)">${item.components || ''}</textarea>
+                            </div>
+                        `;
+                    }
+
+                    cardsHTML += `
+                        <div class="product-edit-card state-${currentStatus}" id="card-${catKey}-${index}">
+                            <button class="delete-card-btn" onclick="deleteProduct('${catKey}', ${index})" title="حذف المنتج"><i class="fa-solid fa-trash-can"></i></button>
+                            ${badgeHTML}
+
+                            <div class="card-header" style="margin-top: 15px;">
+                                <img id="preview-${catKey}-${index}" src="${item.image}" alt="">
+                                <input type="text" class="name-edit-input" value="${item.name || ''}" placeholder="اسم المنتج" onchange="updateValue('${catKey}', ${index}, 'name', this.value)">
+                            </div>
+                            
+                            <div class="status-selector">
+                                <span class="status-label"><i class="fa-solid fa-sliders"></i> التحكم بحالة المنتج على الموقع:</span>
+                                <div class="status-buttons">
+                                    <button class="status-btn btn-active ${currentStatus === 'active' ? 'selected' : ''}" onclick="changeProductStatus('${catKey}', ${index}, 'active')">
+                                        <i class="fa-solid fa-eye"></i> متاح
+                                    </button>
+                                    <button class="status-btn btn-hidden ${currentStatus === 'hidden' ? 'selected' : ''}" onclick="changeProductStatus('${catKey}', ${index}, 'hidden')">
+                                        <i class="fa-solid fa-eye-slash"></i> مخفي (غير متاح)
+                                    </button>
+                                    <button class="status-btn btn-coming ${currentStatus === 'coming_soon' ? 'selected' : ''}" onclick="changeProductStatus('${catKey}', ${index}, 'coming_soon')">
+                                        <i class="fa-solid fa-hourglass-half"></i> قريباً
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="fields-row">
+                                <div class="input-group">
+                                    <label>السعر الجديد</label>
+                                    <input type="text" value="${item.newPrice || ''}" onchange="updateValue('${catKey}', ${index}, 'newPrice', this.value)">
+                                </div>
+                                <div class="input-group">
+                                    <label>السعر القديم</label>
+                                    <input type="text" value="${item.oldPrice || ''}" onchange="updateValue('${catKey}', ${index}, 'oldPrice', this.value)">
+                                </div>
+                                <div class="input-group">
+                                    <label>شارة الخصم</label>
+                                    <input type="text" value="${item.discount || ''}" onchange="updateValue('${catKey}', ${index}, 'discount', this.value)">
+                                </div>
+                                
+                                <div class="input-group full-width">
+                                    <label><i class="fa-regular fa-image"></i> صورة المنتج (تحميل من جهازك)</label>
+                                    <div class="image-upload-wrapper">
+                                        <label class="upload-btn-label">
+                                            <i class="fa-solid fa-upload"></i> اختر صورة جديدة
+                                            <input type="file" accept="image/*" style="display:none" onchange="uploadImageFromDevice('${catKey}', ${index}, this, 'preview-${catKey}-${index}')">
+                                        </label>
+                                        <span class="upload-hint">يدعم صيغ JPG, PNG.</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- [الميزة المطلوبة]: خانة نبذة تعريفية سريعة ومختصرة للمنتج -->
+                                <div class="input-group full-width">
+                                    <label style="color: #0d3b1e; font-weight: bold;"><i class="fa-solid fa-feather-pointed"></i> نبذة تعريفية سريعة عن المنتج (تظهر بجوار الصورة تحت السعر مباشرة)</label>
+                                    <textarea placeholder="اكتب جملة تسويقية أو نبذة مختصرة جداً هنا..." onchange="updateValue('${catKey}', ${index}, 'brief', this.value)">${item.brief || ''}</textarea>
+                                </div>
+
+                                <div class="input-group full-width">
+                                    <label><i class="fa-solid fa-leaf"></i> الفوائد والمميزات للمنتج</label>
+                                    <textarea onchange="updateValue('${catKey}', ${index}, 'benefits', this.value)">${item.benefits || ''}</textarea>
+                                </div>
+                                
+                                <div class="input-group full-width">
+                                    <label><i class="fa-solid fa-wand-magic-sparkles"></i> طريقة الاستخدام الصحيحة</label>
+                                    <textarea onchange="updateValue('${catKey}', ${index}, 'usage', this.value)">${item.usage || ''}</textarea>
+                                </div>
+
+                                ${componentsFieldHTML}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                wrapper.innerHTML += `
+                    <div class="category-block" id="category-block-${catKey}">
+                        <h2 class="category-title"><i class="fa-solid fa-folder-open"></i> قسم ${category.title}</h2>
+                        <div class="products-grid">${cardsHTML}</div>
+                        <div class="add-product-wrapper">
+                            <button class="add-product-btn" onclick="addNewProduct('${catKey}')">
+                                <i class="fa-solid fa-plus"></i> إضافة منتج جديد لقسم ${category.title}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            updateStats();
+            if (searchQuery !== "") {
+                filterProducts(searchQuery);
+            }
+        }
+
+        function changeProductStatus(catKey, itemIndex, newStatus) {
+            const item = localProductsCopy[catKey].items[itemIndex];
+            item.status = newStatus;
+            
+            if (newStatus === 'hidden') {
+                item.hidden = true;
+                item.comingSoon = false;
+            } else if (newStatus === 'coming_soon') {
+                item.hidden = false;
+                item.comingSoon = true;
+            } else {
+                item.hidden = false;
+                item.comingSoon = false;
+            }
+            
+            renderProductsList();
+        }
+
+        function updateStats() {
+            let total = 0, active = 0, hidden = 0, coming = 0;
+            const perCategory = {};
+
+            Object.keys(localProductsCopy).forEach(catKey => {
+                const category = localProductsCopy[catKey];
+                perCategory[catKey] = { title: category.title || catKey, count: category.items.length };
+
+                category.items.forEach(item => {
+                    total++;
+                    let status = item.status || 'active';
+                    if (item.hidden === true) status = 'hidden';
+                    else if (item.comingSoon === true) status = 'coming_soon';
+
+                    if (status === 'active') active++;
+                    else if (status === 'hidden') hidden++;
+                    else if (status === 'coming_soon') coming++;
+                });
+            });
+
+            const statsGrid = document.getElementById('stats-grid-home');
+            if (statsGrid) {
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <span class="stat-card-num">${total}</span>
+                        <span class="stat-card-label"><i class="fa-solid fa-box"></i> إجمالي المنتجات</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-card-num">${active}</span>
+                        <span class="stat-card-label"><i class="fa-solid fa-circle-check"></i> نشط ومتاح</span>
+                    </div>
+                    <div class="stat-card stat-hidden-card">
+                        <span class="stat-card-num">${hidden}</span>
+                        <span class="stat-card-label"><i class="fa-solid fa-eye-slash"></i> مخفي</span>
+                    </div>
+                    <div class="stat-card stat-coming-card">
+                        <span class="stat-card-num">${coming}</span>
+                        <span class="stat-card-label"><i class="fa-solid fa-hourglass-half"></i> سيتوفر قريباً</span>
+                    </div>
+                `;
+            }
+
+            const breakdownEl = document.getElementById('category-breakdown-home');
+            if (breakdownEl) {
+                const rowsHTML = Object.keys(perCategory).map(catKey => `
+                    <div class="cat-row">
+                        <span><i class="fa-solid fa-folder-open"></i> ${perCategory[catKey].title}</span>
+                        <span class="cat-row-count">${perCategory[catKey].count} منتج</span>
+                    </div>
+                `).join('');
+                breakdownEl.innerHTML = `<h3><i class="fa-solid fa-layer-group"></i> عدد المنتجات لكل قسم</h3>${rowsHTML}`;
+            }
+        }
+
+        function filterProducts(val) {
+            searchQuery = val.trim().toLowerCase();
+            Object.keys(localProductsCopy).forEach(catKey => {
+                const category = localProductsCopy[catKey];
+                let visibleInCatCount = 0;
+
+                category.items.forEach((item, index) => {
+                    const cardEl = document.getElementById(`card-${catKey}-${index}`);
+                    if (cardEl) {
+                        const name = (item.name || '').toLowerCase();
+                        if (name.includes(searchQuery)) {
+                            cardEl.style.display = 'flex';
+                            visibleInCatCount++;
+                        } else {
+                            cardEl.style.display = 'none';
+                        }
+                    }
+                });
+
+                const catBlock = document.getElementById(`category-block-${catKey}`);
+                if (catBlock) {
+                    if (searchQuery !== "" && visibleInCatCount === 0) {
+                        catBlock.style.display = 'none';
+                    } else {
+                        catBlock.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        function updateValue(catKey, itemIndex, field, value) {
+            localProductsCopy[catKey].items[itemIndex][field] = value.trim();
+            updateStats();
+        }
+
+        // 🖼️ إعدادات Cloudinary لرفع الصور (بدل تحويلها base64 وتخزينها كاملة جوه الداتابيز)
+        const CLOUDINARY_CLOUD_NAME = "yd0zkpcl";
+        const CLOUDINARY_UPLOAD_PRESET = "qhvtk7b2";
+
+        async function uploadImageFromDevice(catKey, itemIndex, inputElement, imgPreviewId) {
+            const file = inputElement.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 5 ميجابايت.");
+                inputElement.value = "";
+                return;
+            }
+
+            const previewImg = document.getElementById(imgPreviewId);
+            const originalSrc = previewImg.src;
+            previewImg.style.opacity = "0.4"; // مؤشر بسيط إن الرفع شغال
+
+            try {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: "POST",
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (!response.ok || !result.secure_url) {
+                    throw new Error((result.error && result.error.message) || "فشل الرفع لسبب غير معروف");
+                }
+
+                // بيتخزن رابط قصير بس بدل الصورة كاملة - ده اللي بيخلي products.json خفيف وسريع
+                localProductsCopy[catKey].items[itemIndex].image = result.secure_url;
+                previewImg.src = result.secure_url;
+            } catch (error) {
+                console.error("خطأ في رفع الصورة على Cloudinary:", error);
+                alert("فشل رفع الصورة، حاول تاني. (" + error.message + ")");
+                previewImg.src = originalSrc;
+            } finally {
+                previewImg.style.opacity = "1";
+                inputElement.value = "";
+            }
+        }
+
+        function addNewProduct(catKey) {
+            const newId = "prod_" + Date.now() + "_" + Math.floor(Math.random() * 100);
+            const defaultNewProduct = {
+                id: newId,
+                name: "منتج جديد غير مسمى",
+                newPrice: "0 ج.م",
+                oldPrice: "0 ج.م",
+                discount: "خصم 0%",
+                benefits: "",
+                usage: "",
+                brief: "", // حقل النبذة الافتراضي
+                components: "",
+                image: "logo.jpg",
+                status: "active",
+                hidden: false,
+                comingSoon: false
+            };
+
+            localProductsCopy[catKey].items.push(defaultNewProduct);
+            renderProductsList();
+            alert(`تم إدراج كارت منتج جديد في نهاية فئة "${localProductsCopy[catKey].title}". يرجى إدخال تفاصيله وحفظ التعديلات.`);
+        }
+
+        function deleteProduct(catKey, itemIndex) {
+            const productName = localProductsCopy[catKey].items[itemIndex].name;
+            if (confirm(`هل أنت متأكد تماماً من رغبتك في حذف المنتج "${productName}" نهائياً من هذا القسم؟ \n\n(لن يتم تفعيل الحذف إلا بعد الضغط على زر حفظ التعديلات بالأسفل)`)) {
+                localProductsCopy[catKey].items.splice(itemIndex, 1);
+                renderProductsList();
+            }
+        }
+
+        async function saveAllProducts() {
+            try {
+                const authQuery = await buildAdminAuthQuery();
+                const response = await fetch(`${FIREBASE_DB_URL}products.json${authQuery}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(localProductsCopy)
+                });
+
+                if (response.ok) {
+                    alert("تم حفظ ونشر كافة التعديلات بنجاح! 🎉");
+                } else {
+                    alert("عذراً، فشل تحديث البيانات سحابياً. تأكد إنك مسجل دخول كأدمن.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ غير متوقع أثناء الاتصال بقاعدة البيانات.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkAuth();
+        });
+    </script>
+</body>
+</html>

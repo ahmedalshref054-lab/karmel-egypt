@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الأوردرات - Karmel Egypt</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="admin-lock-screen" class="admin-lock-screen">
+        <form class="admin-login-box" onsubmit="attemptLogin(event)">
+            <i class="fa-solid fa-lock admin-lock-icon"></i>
+            <h2>لوحة تحكم كارميل مصر</h2>
+<p>سجل دخول الأدمن</p>
+
+<input
+    type="email"
+    id="admin-email-input"
+    placeholder="البريد الإلكتروني"
+    required>
+
+<input
+    type="password"
+    id="admin-password-input"
+    placeholder="كلمة المرور"
+    required>
+            <p id="admin-login-error" class="admin-login-error"></p>
+            <button type="submit">دخول</button>
+        </form>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div id="admin-app" class="admin-app" style="display:none;">
+        <header class="admin-header">
+            <h1><i class="fa-solid fa-leaf"></i> لوحة تحكم الأوردرات</h1>
+            <div style="display:flex; gap:10px;">
+                <button class="admin-refresh-btn" onclick="handleAdminLogout()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل خروج</button>
+            </div>
+        </header>
+
+        <main class="admin-board">
+            <!-- عمود الطلبات الواردة -->
+            <section class="admin-column">
+                <h2 class="column-title incoming-title">
+                    <i class="fa-solid fa-inbox"></i> الطلبات الواردة
+                    <span class="count-badge" id="count-incoming">0</span>
+                </h2>
+                <div class="orders-list" id="list-incoming"></div>
+            </section>
+
+            <!-- عمود تحت التجهيز -->
+            <section class="admin-column">
+                <h2 class="column-title preparing-title">
+                    <i class="fa-solid fa-box-open"></i> تحت التجهيز
+                    <span class="count-badge" id="count-preparing">0</span>
+                </h2>
+                <div class="orders-list" id="list-preparing"></div>
+            </section>
+
+            <!-- عمود الطلبات المجهزة -->
+            <section class="admin-column">
+                <h2 class="column-title done-title">
+                    <i class="fa-solid fa-circle-check"></i> الطلبات المجهزة
+                    <span class="count-badge" id="count-done">0</span>
+                </h2>
+                <div class="orders-list" id="list-done"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- مودال عرض تفاصيل الأوردر -->
+    <div class="order-modal-overlay" id="order-modal-overlay" onclick="closeOrderModal()">
+        <div class="order-modal" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeOrderModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div id="order-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (نسخة compat: تعمل بـ <script> عادي بدون أي build tool، متوافقة مع بنية fetch الحالية) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    <script src="firebase-auth.js"></script>
+
+    <script src="script.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>

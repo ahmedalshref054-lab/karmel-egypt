@@ -1,0 +1,395 @@
+/* ==========================================================================
+   1. تصفير حواف الصفحة بالكامل لمنع الفراغات الجانبية
+   ========================================================================== */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden; /* يمنع السكرول الأفقي */
+    background-color: #fdfbf7;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    color: #333;
+    direction: rtl; /* لضمان التنسيق العربي الصحيح للشرح والبيانات */
+}
+
+/* ==========================================================================
+   2. تصميم الهيدر (يدعم الشريط السحاب للموبايل والمنيو العادي للكمبيوتر)
+   ========================================================================== */
+.main-header {
+    background-color: #0d3b1e; /* اللون الأخضر الغامق */
+    color: #ffffff;
+    padding: 15px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* الأيقونات */
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-icons .icon-link {
+    color: #ffffff;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.header-icons .icon-link:hover {
+    color: #c5a880; /* لون ذهبي خفيف */
+}
+
+/* شارة عدد السلة (Badge) */
+#cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #ff3b30;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 50%;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* المنيو للكمبيوتر */
+.nav-menu {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.3s;
+    white-space: nowrap;
+}
+
+.nav-menu a:hover {
+    color: #c5a880;
+}
+
+/* اللوجو */
+.logo img {
+    max-height: 50px;
+    display: block;
+}
+
+/* ==========================================================================
+   3. حاوية صفحة الشرح والتفاصيل (الكمبيوتر)
+   ========================================================================== */
+.product-details-container {
+    max-width: 1100px;
+    margin: 50px auto;
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.product-wrapper {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr; /* تفاصيل يسار، صورة يمين */
+    gap: 50px;
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    align-items: center;
+}
+
+/* صندوق الصورة المطور - معروض على اليمين */
+.product-image-box {
+    position: relative;
+    background-color: #ece6d3; /* خلفية البيج الفاتحة */
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 480px;
+}
+
+.product-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* يضمن ظهور محتوى الصورة كله من غير أي قص */
+    padding: 10px; 
+    background-color: #ece6d3;
+}
+
+.detail-discount-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #0d3b1e;
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    z-index: 5;
+}
+
+/* صندوق البيانات - معروض على اليسار */
+.product-info-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: right;
+    gap: 15px;
+}
+
+.detail-title {
+    color: #0d3b1e;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* النبذة التعريفية تحت الاسم */
+.detail-brief {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #444;
+    font-weight: 600;
+    background: #fdfbf7;
+    padding: 14px;
+    border-right: 4px solid #c5a880;
+    border-radius: 6px;
+    margin: 5px 0;
+    white-space: pre-wrap;
+}
+
+/* السعر تحت النبذة */
+.detail-prices {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 5px 0;
+}
+
+.old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 1.1rem;
+}
+
+.new-price {
+    color: #0d3b1e;
+    font-weight: bold;
+    font-size: 1.8rem;
+}
+
+/* زر إضافة للسلة تحت السعر */
+.detail-add-btn {
+    background-color: #0d3b1e;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(13, 59, 30, 0.12);
+}
+
+.detail-add-btn:hover {
+    background-color: #16532d;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   4. الأقسام السفلية للوصف (تحت الصورة بجانب بعض متباعدة بـ 50px)
+   ========================================================================== */
+.product-description-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* عمودين متوازيين */
+    gap: 50px; /* مسافة تباعد تمنع تداخل النصوص */
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+.desc-column-right, .desc-column-left {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-section h3 {
+    color: #0d3b1e;
+    font-size: 1.15rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px solid #0d3b1e;
+    padding-bottom: 8px;
+    width: fit-content;
+}
+
+.info-section h3 i {
+    color: #c5a880; /* لون الأيقونة ذهبي متناسق */
+}
+
+/* ==========================================================================
+   5. التجاوب مع شاشات الموبايل
+   ========================================================================== */
+@media (max-width: 800px) {
+    .main-header {
+        padding: 10px 15px;
+    }
+
+    .header-container {
+        flex-wrap: wrap;
+        row-gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo img {
+        width: 80px;
+    }
+
+    .logo {
+        order: 1;
+    }
+
+    .header-icons {
+        order: 2;
+        gap: 15px;
+    }
+
+    .nav-menu {
+        order: 3;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        position: static !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        gap: 15px !important;
+        padding: 10px 5px 3px 5px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: transparent !important;
+        scrollbar-width: none !important;
+    }
+
+    .nav-menu::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .nav-menu a {
+        font-size: 13px !important;
+        padding: 4px 8px !important;
+        flex: 0 0 auto !important;
+        color: #ffffff !important;
+    }
+
+    /* جعل حاوية الشرح تقترب بالكامل من الحواف الجانبية للشاشة */
+    .product-details-container {
+        width: 100% !important;
+        margin: 15px 0 !important;
+        padding: 0 10px !important; 
+        gap: 20px;
+    }
+
+    /* تحويل الهيكل ليكون رأسياً ومريحاً للتصفح */
+    .product-wrapper {
+        grid-template-columns: 1fr;
+        padding: 20px 15px; 
+        gap: 20px;
+        border-radius: 12px;
+    }
+
+    /* حماية صندوق الصورة وأبعاده لمنع تمطيط صور البرطمانات */
+    .product-image-box {
+        height: 380px; 
+        width: 100%;
+        order: -1; /* الصورة تظهر أولاً في الهاتف */
+    }
+
+    .product-image-box img {
+        padding: 8px; 
+    }
+
+    /* تصغير حجم خط العنوان ليتناسب مع الموبايل */
+    .detail-title {
+        font-size: 1.6rem;
+    }
+
+    .new-price {
+        font-size: 1.5rem;
+    }
+
+    .product-description-container {
+        grid-template-columns: 1fr !important;
+        gap: 25px !important;
+        padding: 20px 15px !important;
+    }
+
+    .detail-add-btn {
+        max-width: 100%;
+        padding: 12px 20px;
+        font-size: 1rem;
+        border-radius: 20px;
+    }
+}
+
+/* ==========================================================================
+   6. ميديا كويري الشاشات الكبيرة (تثبيت المنيو الأفقي للكمبيوتر)
+   ========================================================================== */
+@media (min-width: 769px) {
+    .nav-menu { 
+        display: flex !important; 
+        flex-direction: row !important; 
+        position: static !important;
+        background-color: transparent !important;
+        width: auto !important;
+        padding: 0 !important;
+    }
+}

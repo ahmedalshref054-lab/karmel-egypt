@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmel Egypt - المنتجات</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="category-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="door.css">
+</head>
+<body>
+
+    <!-- باب الدخول -->
+    <div id="door-wrap" class="door-active">
+        <div class="door-panel door-left"></div>
+        <div class="door-panel door-right"></div>
+        <div id="door-center">
+            <img src="logo.jpg" alt="Karmel Logo" id="door-logo-img">
+            <p id="door-tagline">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر 🇪🇬</p>
+        </div>
+    </div>
+
+
+    <!-- الهيدر الموحد للموقع -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-icons">
+                <a href="#" class="icon-link" onclick="openMiniCart(); return false;">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cart-count">0</span>
+                </a>
+                <a href="#" class="icon-link"><i class="fa-solid fa-magnifying-glass"></i></a>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html">الرئيسية</a>
+                <a href="#" onclick="goToCategory('natural'); return false;">المنتجات</a>
+                <a href="#" onclick="goToCategory('boxes'); return false;">البوكسات</a>
+                <a href="#" onclick="goToCategory('packages'); return false;">الباكجات</a>
+                <a href="#" onclick="goToCategory('oils'); return false;">الزيوت</a>
+            </nav>
+            <div class="logo">
+                <img src="logo.jpg" alt="Karmel Logo">
+            </div>
+        </div>
+    </header>
+
+    <!-- محتوى الصفحة المتغير -->
+    <main class="products-page-container">
+        
+        <!-- الجزء العلوي: العنوان وفلتر الترتيب -->
+        <div class="page-header-bar">
+            <div class="sort-dropdown">
+                <select id="sort-select">
+                    <option value="latest">الأحدث</option>
+                    <option value="low-high">السعر: من الأقل للأعلى</option>
+                    <option value="high-low">السعر: من الأعلى للأقل</option>
+                </select>
+            </div>
+            <!-- اسم القسم هيتغير تلقائي بالجافا سكريبت -->
+            <h1 id="category-title" class="category-main-title">تحميل القسم...</h1>
+        </div>
+
+        <!-- حاوية كروت المنتجات (هتظهر هنا المنتجات بناءً على القسم) -->
+        <div id="products-grid" class="products-grid">
+            <!-- الكروت هتترسم هنا بواسطة الجافا سكريبت -->
+        </div>
+
+    </main>
+
+    <!-- الفوتر الموحد للموقع -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links-col">
+                <h4>تواصل معنا</h4>
+                <ul>
+                    <li><a href="tel:00000000"><i class="fas fa-phone"></i> 0000000</a></li>
+                    <li><a href="mailto:0000000@gmail.com"><i class="fas fa-envelope"></i> 0000000@gmail.com</a></li>
+                    <li><a href="https://wa.me/2000000000" target="_blank"><i class="fab fa-whatsapp"></i> تواصل عبر واتساب</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>خدمة العملاء</h4>
+                <ul>
+                    <li><a href="policy.html?page=shipping">سياسة الشحن</a></li>
+                    <li><a href="policy.html?page=return">سياسة الاستبدال والاسترجاع</a></li>
+                    <li><a href="policy.html?page=privacy">سياسات الخصوصية</a></li>
+                    <li><a href="policy.html?page=terms">الشروط والأحكام</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>الأقسام</h4>
+                <ul>
+                    <li><a href="#" onclick="goToCategory('natural'); return false;">المنتجات</a></li>
+                    <li><a href="#" onclick="goToCategory('boxes'); return false;">البوكسات</a></li>
+                    <li><a href="#" onclick="goToCategory('packages'); return false;">الباكجات</a></li>
+                    <li><a href="#" onclick="goToCategory('oils'); return false;">الزيوت</a></li>
+                </ul>
+            </div>
+            <div class="footer-brand">
+                <img src="logo.jpg" alt="Auria Logo" class="footer-logo">
+                <p class="brand-desc">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر EG</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/2000000000" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Karmel EGYPT – All Rights Reserved © 2026</p>
+        </div>
+    </footer>
+
+    <script src="door.js"></script>
+    <!-- Firebase SDK (نسخة compat) - لازم للتحديث اللحظي للأسعار بدون Refresh -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    <script src="firebase-init.js"></script>
+    <script src="script.js"></script>
+    <script src="category-script.js"></script>
+</body>
+</html>
