@@ -157,6 +157,7 @@ body {
     align-items: center;
     padding-bottom: 15px;
     transition: transform 0.3s;
+    height: 100%; /* الكارت ياخد نفس ارتفاع باقي كروت الصف */
 }
 
 .product-card:hover {
@@ -194,6 +195,9 @@ body {
     text-align: center;
     padding: 15px 10px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* يملأ المساحة المتبقية في الكارت مهما كان طول الاسم أو السعر */
 }
 
 .product-name {
@@ -234,6 +238,7 @@ body {
     cursor: pointer;
     width: 85%;
     transition: background-color 0.3s;
+    margin-top: auto; /* يدفع الزرار دايمًا لآخر الكارت مهما كان طول الاسم أو السعر فوقه */
 }
 
 .add-to-cart-btn:hover {

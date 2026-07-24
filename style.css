@@ -382,6 +382,7 @@ body {
     min-width: 240px;
     box-sizing: border-box;
     margin: 0 auto; /* سنترة ذاتية للكارت */
+    height: 100%; /* الكارت ياخد نفس ارتفاع باقي كروت الصف/السلايدر */
 }
 
 .home-product-card:hover {
@@ -415,6 +416,9 @@ body {
     text-align: center;
     padding: 15px 10px 0 10px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* يملأ المساحة المتبقية في الكارت مهما اختلف طول الاسم أو السعر */
 }
 
 .home-product-name {
@@ -422,6 +426,11 @@ body {
     color: #0d3b1e;
     margin-bottom: 10px;
     font-weight: bold;
+    min-height: 2.6rem; /* تحجز مساحة سطرين دايماً، سواء كان الاسم سطر أو سطرين، عشان يبدأ السعر والزرار من نفس المكان في كل الكروت */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.25;
 }
 
 .home-product-prices {
@@ -570,7 +579,7 @@ body {
     scroll-behavior: smooth;
     padding: 20px 10px;
     width: 100%;
-    align-items: flex-start;
+    align-items: stretch; /* كل الكروت في نفس ارتفاع بعض */
     scrollbar-width: none;
 }
 
@@ -589,12 +598,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     position: relative;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
     cursor: pointer;
     transition: transform 0.3s ease;
     box-sizing: border-box;
+    height: 100%; /* الكارت ياخد نفس ارتفاع باقي كروت الصف، فالزرار يفضل في نفس المكان دايماً */
 }
 
 .natural-card:hover {
@@ -636,6 +646,11 @@ body {
     color: #1b3c24;
     margin: 8px 0;
     font-weight: bold;
+    min-height: 2.6em; /* تحجز مساحة سطرين دايماً، عشان السعر والزرار يبدأوا من نفس المكان في كل الكروت */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.25;
 }
 
 .natural-price-box {
@@ -879,6 +894,12 @@ footer {
     justify-content: center;
     align-items: center;
     gap: 8px;
+}
+
+/* داخل كروت المنتج المرنة، الزرار يتثبت دايمًا في الآخر مهما اختلف طول الاسم أو السعر فوقه */
+.home-product-info .cart-add-btn,
+.natural-card .cart-add-btn {
+    margin-top: auto;
 }
 
 .cart-add-btn:hover {
