@@ -37,6 +37,7 @@ async function attemptLogin(event) {
 
 async function handleAdminLogout() {
     stopLiveOrdersListener();
+    stopLiveDailyReportsListener();
     await adminSignOut();
     // watchAdminAuthState هتتكفل بإخفاء لوحة التحكم وإظهار شاشة الدخول تلقائياً
 }
@@ -48,21 +49,48 @@ function showAdminApp() {
     // أي أوردر جديد أو تعديل حالة بعد كده هيوصل ويترسم لوحده تلقائياً بدون أي تحديث يدوي
     onLiveOrdersUpdate((orders) => renderBoard(orders));
 
+    // نفس الفكرة بالظبط لعمود "التقرير اليومي" - أي أوردر يتحط "تم التجهيز" يظهر فوراً
+    onLiveDailyReportsUpdate((reports) => renderDailyColumn(reports));
+
     // أول عرض للوحة، بمجرد ما توصل أول نسخة من الأوردرات
     startLiveOrdersListener().then((orders) => {
         if (orders) renderBoard(orders);
     });
+
+    // أول عرض لعمود التقرير اليومي، بمجرد ما توصل أول نسخة من سجل التقارير
+    startLiveDailyReportsListener().then((reports) => {
+        if (reports) renderDailyColumn(reports);
+    });
+
+    // مراقبة دخول يوم جديد كل دقيقة، عشان عمود "التقرير اليومي" يتصفر لوحده
+    // بالظبط مع أول لحظة بعد منتصف الليل حتى لو حد سايب الصفحة مفتوحة من غير ريفرش
+    startMidnightWatcher();
 }
 
-function formatOrderDate(isoString) {
-    const d = new Date(isoString);
-    return d.toLocaleDateString('ar-EG') + ' - ' + d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+let midnightWatcherStarted = false;
+function startMidnightWatcher() {
+    if (midnightWatcherStarted) return; // منمنعش تشغيل أكتر من مؤقت واحد لو الدالة اتنادت أكتر من مرة
+    midnightWatcherStarted = true;
+
+    let lastKnownDateKey = getTodayDateKey();
+    setInterval(() => {
+        const currentDateKey = getTodayDateKey();
+        if (currentDateKey !== lastKnownDateKey) {
+            lastKnownDateKey = currentDateKey;
+            renderDailyColumn(); // إعادة رسم العمود بنفس البيانات المخزنة، لكن بفلتر تاريخ اليوم الجديد
+        }
+    }, 60 * 1000); // فحص كل دقيقة
 }
+
+// نحتفظ بآخر نسخة من الأوردرات وصلت عشان نقدر نجيب بيانات الأوردر كاملة
+// وقت الضغط على "تم التجهيز" (محتاجينها كاملة عشان نحفظ نسخة في سجل التقارير)
+let ordersCache = [];
 
 // جلب وعرض البيانات سحابياً
 // ممكن تتنادى بأوردرات جاهزة من الـ listener اللحظي، أو من غير باراميتر لعمل جلب لمرة واحدة (استخدام احتياطي)
 async function renderBoard(ordersParam) {
     const orders = ordersParam || await getOrders();
+    ordersCache = orders;
 
     const incoming = orders.filter(o => o.status === 'incoming');
     const preparing = orders.filter(o => o.status === 'preparing');
@@ -89,6 +117,47 @@ function emptyColumnMsg(text) {
     return `<p class="empty-column-msg">${text}</p>`;
 }
 
+/* ============================================================
+   عمود "التقرير اليومي" - بيعرض بس أوردرات النهاردة (اللي اتحطت
+   "تم التجهيز" في نفس تاريخ اليوم الحالي). بيتصفر لوحده تلقائياً
+   بكرة الصبح من غير أي حذف يدوي، لأن الفلترة على تاريخ اليوم الحالي.
+   ============================================================ */
+// آخر نسخة وصلت من سجل التقارير كاملة - مستخدمة عشان زرار "عرض" في عمود
+// التقرير اليومي يقدر يجيب بيانات الأوردر منها (بعد ما يتنقل، مبيبقاش موجود في orders)
+let dailyReportsCache = {};
+
+function renderDailyColumn(reportsParam) {
+    // لو اتنادت من غير أي بيانات جديدة (زي فحص منتصف الليل)، بنعيد الاستخدام
+    // لآخر نسخة كانت متخزنة بدل ما نمسحها، وبس نعيد حساب فلتر تاريخ اليوم
+    const reports = reportsParam !== undefined ? reportsParam : dailyReportsCache;
+    dailyReportsCache = reports;
+    const todayKey = getTodayDateKey();
+    const todayOrders = reports[todayKey]
+        ? Object.keys(reports[todayKey]).map(k => reports[todayKey][k])
+        : [];
+
+    document.getElementById('count-daily').textContent = todayOrders.length;
+    document.getElementById('list-daily').innerHTML = todayOrders.length
+        ? todayOrders.map(o => renderDailyReportCard(o)).join('')
+        : emptyColumnMsg('لا يوجد أوردرات تم تجهيزها النهاردة بعد');
+}
+
+function renderDailyReportCard(order) {
+    return `
+        <div class="order-card">
+            <div class="order-card-top">
+                <span class="order-id">${order.id}</span>
+                <span class="order-time">${formatOrderDate(order.createdAt)}</span>
+            </div>
+            <p class="order-customer-name"><i class="fa-solid fa-user"></i> ${order.customer.name}</p>
+            <p class="order-total"><i class="fa-solid fa-sack-dollar"></i> ${order.total} ج.م</p>
+            <div class="order-card-actions">
+                <button class="view-btn" onclick="openDailyReportModal('${order.id}')"><i class="fa-solid fa-eye"></i> عرض</button>
+            </div>
+        </div>
+    `;
+}
+
 function renderOrderCard(order, status) {
     let actionButtons = `<button class="view-btn" onclick="openOrderModal('${order.id}')"><i class="fa-solid fa-eye"></i> عرض</button>`;
 
@@ -96,6 +165,8 @@ function renderOrderCard(order, status) {
         actionButtons += `<button class="advance-btn" onclick="moveOrder('${order.id}', 'preparing')">تحت التجهيز <i class="fa-solid fa-arrow-left"></i></button>`;
     } else if (status === 'preparing') {
         actionButtons += `<button class="advance-btn done-btn" onclick="moveOrder('${order.id}', 'done')">تم التجهيز <i class="fa-solid fa-check"></i></button>`;
+    } else if (status === 'done') {
+        actionButtons += `<button class="advance-btn move-to-report-btn" onclick="moveToReport('${order.id}')">نقل للتقرير <i class="fa-solid fa-arrow-down"></i></button>`;
     }
 
     return `
@@ -128,11 +199,36 @@ async function moveOrder(orderId, newStatus) {
     renderBoard();
 }
 
+// نقل الأوردر يدويًا من عمود "الطلبات المجهزة" لعمود "التقرير اليومي":
+// بنحفظ نسخة منه في سجل التقارير بتاريخ اليوم الحالي (هتظهر فوراً في عمود
+// التقرير اليومي هنا وكمان في صفحة الأسعار)، وبعدها بنمسحه من عمود
+// "الطلبات المجهزة" عشان يختفي من هناك وينزل تحت.
+async function moveToReport(orderId) {
+    const order = ordersCache.find(o => o.id === orderId);
+    if (!order) return;
+
+    await saveDailyReport({ ...order, status: 'done' });
+    await deleteOrderFromCloud(orderId);
+    renderBoard();
+}
+
 async function openOrderModal(orderId) {
     const orders = await getOrders();
     const order = orders.find(o => o.id === orderId);
     if (!order) return;
+    renderOrderModalContent(order);
+}
 
+// نسخة تانية بتفتح المودال لأوردر جاي من عمود "التقرير اليومي" (مش موجود في orders
+// أصلاً بعد ما اتنقل، فبنجيب بياناته من آخر نسخة وصلت من سجل التقارير بدل ما نبحث في orders)
+function openDailyReportModal(orderId) {
+    const todayKey = getTodayDateKey();
+    const order = dailyReportsCache[todayKey] ? dailyReportsCache[todayKey][orderId] : null;
+    if (!order) return;
+    renderOrderModalContent(order);
+}
+
+function renderOrderModalContent(order) {
     const itemsHTML = order.items.map(item => `
         <div class="modal-item-row">
             <img src="${item.image}" alt="${item.name}">

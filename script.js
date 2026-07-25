@@ -305,6 +305,120 @@ async function deleteOrderFromCloud(orderId) {
     }
 }
 
+/* ============================================================
+   3.5) سجل التقارير اليومية (Daily Reports)
+   بدل ما نحذف الأوردر نهائياً وقت "تم التجهيز"، بنحفظ نسخة منه في
+   مسار منفصل daily-reports/{تاريخ اليوم}/{orderId} بتاريخ اليوم
+   اللي اتحط فيه الأوردر "تم التجهيز". ده بيسمح بعمل:
+   - عمود "التقرير اليومي" في صفحة الكول سنتر (بيعرض بس أوردرات النهاردة
+     ويتصفر لوحده تلقائياً كل يوم لأن الفلترة على التاريخ الحالي).
+   - تبويب "التقارير" في صفحة الأسعار (بيعرض كل الأيام، وفيه حذف نهائي).
+   ============================================================ */
+
+// بيرجع تاريخ اليوم كمفتاح ثابت (YYYY-MM-DD) يصلح كاسم node في Firebase
+function getTodayDateKey() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+// حفظ نسخة من الأوردر في سجل التقارير بتاريخ اليوم الحالي (يُستدعى وقت "تم التجهيز")
+async function saveDailyReport(order) {
+    try {
+        const authQuery = await buildAdminAuthQuery();
+        const dateKey = getTodayDateKey();
+        await fetch(`${FIREBASE_DB_URL}daily-reports/${dateKey}/${order.id}.json${authQuery}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(order)
+        });
+    } catch (error) {
+        console.error("Error saving daily report:", error);
+    }
+}
+
+// جلب كل سجل التقارير (كل الأيام) لمرة واحدة - تُستخدم في صفحة الأسعار (تبويب التقارير)
+async function getDailyReports() {
+    try {
+        const authQuery = await buildAdminAuthQuery();
+        const response = await fetch(`${FIREBASE_DB_URL}daily-reports.json${authQuery}`);
+        const data = await response.json();
+        return data || {};
+    } catch (error) {
+        console.error("Error fetching daily reports:", error);
+        return {};
+    }
+}
+
+// حذف أوردر واحد نهائياً من سجل التقارير (من صفحة الأسعار فقط)
+async function deleteDailyReportOrder(dateKey, orderId) {
+    try {
+        const authQuery = await buildAdminAuthQuery();
+        await fetch(`${FIREBASE_DB_URL}daily-reports/${dateKey}/${orderId}.json${authQuery}`, {
+            method: 'DELETE'
+        });
+    } catch (error) {
+        console.error("Error deleting daily report order:", error);
+    }
+}
+
+/* استماع لحظي لسجل التقارير كامل - مستخدم في عمود "التقرير اليومي"
+   بصفحة الكول سنتر، بحيث أي أوردر يتحط "تم التجهيز" يظهر فوراً بدون تحديث يدوي */
+let dailyReportsListenerStarted = false;
+const dailyReportsUpdateCallbacks = [];
+
+function onLiveDailyReportsUpdate(callback) {
+    dailyReportsUpdateCallbacks.push(callback);
+}
+
+function startLiveDailyReportsListener() {
+    return new Promise((resolve) => {
+        if (typeof firebase === 'undefined' || !firebase.database) {
+            getDailyReports().then((reports) => { resolve(reports); });
+            return;
+        }
+
+        if (dailyReportsListenerStarted) {
+            resolve(null);
+            return;
+        }
+        dailyReportsListenerStarted = true;
+
+        let isFirstSnapshot = true;
+        firebase.database().ref('daily-reports').on('value', (snapshot) => {
+            const reports = snapshot.val() || {};
+
+            if (isFirstSnapshot) {
+                isFirstSnapshot = false;
+                resolve(reports);
+            } else {
+                dailyReportsUpdateCallbacks.forEach(cb => {
+                    try { cb(reports); } catch (e) { console.error(e); }
+                });
+            }
+        }, (error) => {
+            console.error("خطأ في الاتصال اللحظي بسجل التقارير:", error);
+            resolve({});
+        });
+    });
+}
+
+// إيقاف الاستماع اللحظي لسجل التقارير (مثلاً عند تسجيل الخروج)
+function stopLiveDailyReportsListener() {
+    if (typeof firebase !== 'undefined' && firebase.database) {
+        firebase.database().ref('daily-reports').off('value');
+    }
+    dailyReportsListenerStarted = false;
+}
+
+// دالة تنسيق تاريخ ووقت الأوردر - مشتركة بين لوحة الأوردرات وتبويب التقارير
+function formatOrderDate(isoString) {
+    const d = new Date(isoString);
+    return d.toLocaleDateString('ar-EG') + ' - ' + d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+}
+
 /* ربط فتح شات الواتساب مع العميل من كارت تفاصيل الآدمن */
 function openWhatsAppChat(phone, message) {
     let cleanPhone = phone.trim().replace(/[\s\+\-]/g, '');

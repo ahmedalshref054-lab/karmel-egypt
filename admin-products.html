@@ -288,6 +288,61 @@
             .containers-grid { grid-template-columns: 1fr; }
         }
 
+        /* ===== شاشة التقارير (كل يوم في بلوك منفصل) ===== */
+        .report-day-block {
+            margin-bottom: 26px;
+        }
+        .report-day-title {
+            color: #0d3b1e;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eae5c8;
+            cursor: pointer;
+            user-select: none;
+        }
+        .report-day-title .toggle-arrow {
+            margin-inline-start: auto;
+            transition: transform 0.25s ease;
+            color: #999;
+        }
+        .report-day-block.collapsed .toggle-arrow { transform: rotate(-90deg); }
+        .report-day-block.collapsed .report-day-orders { display: none; }
+        .report-day-title .count-badge {
+            background: #0d3b1e; color: #fff; font-size: 11px;
+            padding: 2px 8px; border-radius: 20px; font-weight: normal;
+        }
+        .report-day-orders {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 14px;
+        }
+        .report-order-card {
+            background: #fff; border: 1px solid #e6e6e6; border-radius: 10px; padding: 14px;
+        }
+        .report-order-top {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px; font-size: 12px; color: #999;
+        }
+        .report-order-id { font-weight: bold; color: #0d3b1e; font-size: 13.5px; }
+        .report-order-line { font-size: 13px; color: #333; margin: 4px 0; }
+        .report-delete-btn {
+            flex: 1; padding: 8px; border: none; border-radius: 7px;
+            background-color: #ffe5e5; color: #d81b1b; font-size: 12.5px; font-weight: bold;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .report-delete-btn:hover { background-color: #d81b1b; color: #fff; }
+        .report-view-btn {
+            flex: 1; padding: 8px; border: none; border-radius: 7px;
+            background-color: #eef3ee; color: #0d3b1e; font-size: 12.5px; font-weight: bold;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .report-view-btn:hover { background-color: #0d3b1e; color: #fff; }
+
         /* ===== شاشة الإحصائيات ===== */
         .stats-grid {
             display: grid;
@@ -373,6 +428,49 @@
             cursor: pointer;
             font-size: 14px;
         }
+
+        /* ===== مودال عرض تفاصيل الطلب (تبويب التقارير) ===== */
+        .order-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 9999; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s ease; display: flex;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .order-modal-overlay.active { opacity: 1; pointer-events: all; }
+        .order-modal {
+            background: #fff; border-radius: 14px; max-width: 480px; width: 100%;
+            max-height: 85vh; overflow-y: auto; padding: 25px; position: relative;
+        }
+        .order-modal .modal-close-btn {
+            position: absolute; top: 14px; left: 14px; background: #f0f0f0;
+            border: none; width: 30px; height: 30px; border-radius: 50%;
+            cursor: pointer; font-size: 14px;
+        }
+        .order-modal h2 { color: #0d3b1e; font-size: 18px; margin-bottom: 4px; }
+        .modal-order-date { color: #999; font-size: 12px; margin-bottom: 10px; }
+        .modal-section { margin-top: 16px; }
+        .modal-section h3 {
+            color: #0d3b1e; font-size: 14.5px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .modal-section p { font-size: 13.5px; color: #333; margin: 5px 0; }
+        .modal-item-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid #f0f0f0;
+        }
+        .modal-item-row img { width: 46px; height: 46px; object-fit: cover; border-radius: 8px; }
+        .modal-item-info p { font-size: 13px; margin: 0 0 4px 0; color: #333; }
+        .modal-item-info span { font-size: 12px; color: #777; }
+        .modal-total-row {
+            display: flex; justify-content: space-between; font-weight: bold;
+            color: #0d3b1e; margin-top: 14px; padding-top: 10px; border-top: 2px solid #eae5c8;
+        }
+        .whatsapp-contact-btn {
+            margin-top: 10px; width: 100%; padding: 10px; border: none; border-radius: 8px;
+            background: #25D366; color: #fff; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .whatsapp-contact-btn:hover { background: #1ebe5b; }
     </style>
 </head>
 <body>
@@ -424,6 +522,9 @@
                 <button class="sidebar-item" id="sidebar-btn-shipping" onclick="switchAdminView('shipping')">
                     <i class="fa-solid fa-truck-fast"></i> تحديث أسعار الشحن
                 </button>
+                <button class="sidebar-item" id="sidebar-btn-reports" onclick="switchAdminView('reports')">
+                    <i class="fa-solid fa-chart-column"></i> التقارير
+                </button>
             </aside>
 
             <main class="admin-content">
@@ -464,12 +565,27 @@
                         <button class="save-btn" onclick="saveCategoryCards()"><i class="fa-solid fa-cloud-arrow-up"></i> رفع التعديلات</button>
                     </div>
                 </div>
+
+                <!-- شاشة التقارير: كل الأوردرات اللي "تم تجهيزها"، مقسّمة يوم بيوم -->
+                <div id="view-reports" class="admin-view">
+                    <h2 class="view-title"><i class="fa-solid fa-chart-column"></i> التقارير</h2>
+                    <p style="color:#666; font-size:13px; margin-bottom:20px;">كل الأوردرات اللي تم تجهيزها، كل يوم منفصل عن التاني. الحذف من هنا نهائي ومش هيرجع تاني.</p>
+                    <div id="reports-wrapper"></div>
+                </div>
             </main>
         </div>
 
         <div class="save-bar" id="main-save-bar">
             <span style="font-size: 13px; color: #666;"><i class="fa-solid fa-circle-info"></i> أي تعديل تحفظه سيقوم بتحديث الأسعار فوراً أمام جميع العملاء.</span>
             <button class="save-btn" onclick="saveAllProducts()"><i class="fa-solid fa-cloud-arrow-up"></i> حفظ ونشر التعديلات</button>
+        </div>
+    </div>
+
+    <!-- مودال عرض تفاصيل الطلب (تبويب التقارير) -->
+    <div class="order-modal-overlay" id="order-modal-overlay" onclick="closeOrderModal()">
+        <div class="order-modal" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeOrderModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div id="order-modal-content"></div>
         </div>
     </div>
 
@@ -619,7 +735,9 @@
             await loadProductsFromServer();
             await loadShippingPricesFromServer();
             await loadCategoryCardsFromServer();
-            switchAdminView('home');
+            // نرجع لآخر شاشة كان الأدمن فاتحها قبل الريفرش (لو مفيش حاجة محفوظة، الرئيسية هي الافتراضي)
+            const savedView = sessionStorage.getItem('adminActiveView') || 'home';
+            switchAdminView(savedView);
         }
 
         async function loadProductsFromServer() {
@@ -832,8 +950,144 @@
             }
         }
 
+/* ============================================================
+   شاشة التقارير: عرض كل الأوردرات اللي "تم تجهيزها"، كل يوم في بلوك
+   منفصل (الأحدث فوق، ومطوي افتراضياً)، مع زرار عرض تفاصيل وزرار حذف نهائي
+   ============================================================ */
+        // آخر نسخة وصلت من سجل التقارير - مستخدمة عشان زرار "عرض" يقدر يجيب
+        // بيانات الأوردر منها من غير ما يحتاج يرجع يطلب من فايربيز تاني
+        let reportsDataCache = {};
+
+        // الأيام اللي الأدمن فاتحها (مش مطوية) - بنحتفظ بيها في متغير مستقل
+        // عشان لو حذفنا أوردر وأعدنا رسم الصفحة، الأيام المفتوحة تفضل مفتوحة
+        // بدل ما ترجع تتطوي تلقائياً زي أول مرة
+        let expandedReportDays = new Set();
+
+        async function renderReportsView() {
+            const wrapper = document.getElementById('reports-wrapper');
+            wrapper.innerHTML = '<p style="color:#999; font-size:13px;">جاري تحميل التقارير...</p>';
+
+            const reports = await getDailyReports();
+            reportsDataCache = reports;
+            const dateKeys = Object.keys(reports).sort((a, b) => b.localeCompare(a)); // الأحدث فوق
+
+            if (dateKeys.length === 0) {
+                wrapper.innerHTML = '<p style="color:#999; font-size:13px;">لا يوجد أي أوردرات تم تجهيزها وتسجيلها في التقارير حتى الآن.</p>';
+                return;
+            }
+
+            // كل يوم مطوي (collapsed) افتراضياً، إلا لو الأدمن كان فاتحه قبل كده
+            wrapper.innerHTML = dateKeys.map(dateKey => {
+                const dayOrders = Object.keys(reports[dateKey]).map(id => reports[dateKey][id]);
+                const isExpanded = expandedReportDays.has(dateKey);
+                return `
+                    <div class="report-day-block${isExpanded ? '' : ' collapsed'}" id="report-day-${dateKey}">
+                        <h3 class="report-day-title" onclick="toggleReportDay('${dateKey}')">
+                            <i class="fa-solid fa-calendar-day"></i> ${dateKey}
+                            <span class="count-badge">${dayOrders.length}</span>
+                            <i class="fa-solid fa-chevron-down toggle-arrow"></i>
+                        </h3>
+                        <div class="report-day-orders">
+                            ${dayOrders.map(o => renderReportOrderCard(dateKey, o)).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // فتح/قفل يوم معين: أول ضغطة تفتح، تاني ضغطة تقفل - وكل الأيام مستقلة عن بعض
+        function toggleReportDay(dateKey) {
+            const block = document.getElementById(`report-day-${dateKey}`);
+            if (!block) return;
+
+            block.classList.toggle('collapsed');
+            if (block.classList.contains('collapsed')) {
+                expandedReportDays.delete(dateKey);
+            } else {
+                expandedReportDays.add(dateKey);
+            }
+        }
+
+        function renderReportOrderCard(dateKey, order) {
+            return `
+                <div class="report-order-card">
+                    <div class="report-order-top">
+                        <span class="report-order-id">${order.id}</span>
+                        <span class="report-order-time">${formatOrderDate(order.createdAt)}</span>
+                    </div>
+                    <p class="report-order-line"><i class="fa-solid fa-user"></i> ${order.customer.name}</p>
+                    <p class="report-order-line"><i class="fa-solid fa-sack-dollar"></i> ${order.total} ج.م</p>
+                    <div style="display:flex; gap:8px; margin-top:10px;">
+                        <button class="report-view-btn" onclick="openReportOrderModal('${dateKey}', '${order.id}')"><i class="fa-solid fa-eye"></i> عرض</button>
+                        <button class="report-delete-btn" onclick="confirmDeleteReportOrder('${dateKey}', '${order.id}')">
+                            <i class="fa-solid fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function confirmDeleteReportOrder(dateKey, orderId) {
+            if (confirm('متأكد إنك عايز تحذف الأوردر ده نهائياً من التقارير؟ الحذف نهائي ومش هيرجع تاني.')) {
+                deleteDailyReportOrder(dateKey, orderId).then(() => renderReportsView());
+            }
+        }
+
+        // فتح مودال تفاصيل الطلب لأوردر جاي من صفحة التقارير (بيانات الأوردر بتتجاب
+        // من reportsDataCache مباشرة لأنه أصلاً مش موجود في orders بعد ما اتنقل للتقرير)
+        function openReportOrderModal(dateKey, orderId) {
+            const order = reportsDataCache[dateKey] ? reportsDataCache[dateKey][orderId] : null;
+            if (!order) return;
+
+            const itemsHTML = order.items.map(item => `
+                <div class="modal-item-row">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="modal-item-info">
+                        <p>${item.name}</p>
+                        <span>${item.price} ج.م × ${item.quantity} = ${item.price * item.quantity} ج.م</span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('order-modal-content').innerHTML = `
+                <h2>تفاصيل الطلب ${order.id}</h2>
+                <p class="modal-order-date">${formatOrderDate(order.createdAt)}</p>
+
+                <div class="modal-section">
+                    <h3><i class="fa-solid fa-user"></i> بيانات العميل</h3>
+                    <p><strong>الاسم:</strong> ${order.customer.name}</p>
+                    <p><strong>الهاتف:</strong> ${order.customer.phone}</p>
+                    <p><strong>المحافظة:</strong> ${order.customer.governorate || '-'}</p>
+                    <p><strong>العنوان:</strong> ${order.customer.address}</p>
+                    <button class="whatsapp-contact-btn" onclick="openWhatsAppChat('${order.customer.phone}', 'أهلاً ${order.customer.name}، بخصوص طلبك رقم ${order.id} من كارميل مصر...')">
+                        <i class="fab fa-whatsapp"></i> تواصل مع العميل
+                    </button>
+                </div>
+
+                <div class="modal-section">
+                    <h3><i class="fa-solid fa-bag-shopping"></i> المنتجات</h3>
+                    ${itemsHTML}
+                </div>
+
+                <div class="modal-total-row">
+                    <span>الإجمالي</span>
+                    <span>${order.total} ج.م</span>
+                </div>
+                ${order.shippingCost ? `<p style="text-align:left; font-size:12px; color:#999; margin-top:4px;">شامل رسوم شحن: ${order.shippingCost} ج.م</p>` : ''}
+            `;
+
+            document.getElementById('order-modal-overlay').classList.add('active');
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-modal-overlay').classList.remove('active');
+        }
+
         function switchAdminView(viewName) {
             currentAdminView = viewName;
+            // نحفظ آخر شاشة كان الأدمن فاتحها عشان لو عمل ريفرش يرجعله لنفس الشاشة
+            // بدل ما يترمي على "الرئيسية" كل مرة
+            sessionStorage.setItem('adminActiveView', viewName);
 
             document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById(`sidebar-btn-${viewName}`);
@@ -843,6 +1097,7 @@
             document.getElementById('view-products').classList.remove('active-view');
             document.getElementById('view-shipping').classList.remove('active-view');
             document.getElementById('view-containers').classList.remove('active-view');
+            document.getElementById('view-reports').classList.remove('active-view');
 
             const mainSaveBar = document.getElementById('main-save-bar');
 
@@ -858,6 +1113,10 @@
                 document.getElementById('view-containers').classList.add('active-view');
                 mainSaveBar.style.display = 'none';
                 renderContainersList();
+            } else if (viewName === 'reports') {
+                document.getElementById('view-reports').classList.add('active-view');
+                mainSaveBar.style.display = 'none';
+                renderReportsView();
             } else {
                 document.getElementById('view-products').classList.add('active-view');
                 mainSaveBar.style.display = 'flex';

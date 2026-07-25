@@ -6,6 +6,28 @@
     <title>لوحة تحكم الأوردرات - Karmel Egypt</title>
     <link rel="stylesheet" href="admin-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== صف "التقرير اليومي" (بعرض الصفحة كامل تحت الأعمدة التلاتة) =====
+           ملحوظة: الكلاسات دي بس، الباقي (order-card, column-title, count-badge...)
+           بيستخدم نفس الستايل الأساسي الموجود في admin-style.css من غير أي تعديل فيه */
+        .admin-daily-report-section {
+            width: 100%;
+            box-sizing: border-box;
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0 0 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .admin-daily-report-section .daily-orders-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 15px;
+        }
+        .admin-daily-report-section .empty-column-msg {
+            grid-column: 1 / -1;
+        }
+    </style>
 </head>
 <body>
 
@@ -69,6 +91,16 @@
                 <div class="orders-list" id="list-done"></div>
             </section>
         </main>
+
+        <!-- صف منفصل بعرض الصفحة كامل: التقرير اليومي (أوردرات النهاردة اللي "تم تجهيزها" فقط،
+             بيتصفر لوحده تلقائياً كل يوم لأن الفلترة على تاريخ اليوم الحالي مش على تايمر) -->
+        <section class="admin-daily-report-section">
+            <h2 class="column-title daily-title">
+                <i class="fa-solid fa-calendar-day"></i> التقرير اليومي
+                <span class="count-badge" id="count-daily">0</span>
+            </h2>
+            <div class="orders-list daily-orders-list" id="list-daily"></div>
+        </section>
     </div>
 
     <!-- مودال عرض تفاصيل الأوردر -->
