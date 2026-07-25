@@ -155,7 +155,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-bottom: 15px;
+    padding: 10px 10px 15px 10px; /* حشو من فوق كمان عشان زوايا الصورة الدائرية تبان واضحة على كل الجوانب */
     transition: transform 0.3s;
     height: 100%; /* الكارت ياخد نفس ارتفاع باقي كروت الصف */
 }
@@ -168,7 +168,7 @@ body {
 .discount-badge {
     position: absolute;
     top: 12px;
-    right: 12px;
+    left: 12px;
     background-color: #fff;
     color: #0d3b1e;
     border: 1px solid #0d3b1e;
@@ -186,8 +186,7 @@ body {
     object-fit: contain; /* يضمن ظهور البرطمان كاملاً دون قص غطائه أو قاعدته */
     padding: 10px; /* حشو داخلي يمنع التصاق حواف الصورة بأطراف الكارت */
     background-color: #ece6d3; /* الحفاظ على نفس الخلفية البيج المريحة للعين */
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
+    border-radius: 28px; /* حواف دائرية واضحة للصورة نفسها على كل الجوانب، أوضح من حواف الكارت */
 }
 
 /* تفاصيل الكارت (الأسماء والأسعار) */
@@ -328,14 +327,13 @@ body {
 
     /* كارت المنتج على الموبايل */
     .product-card {
-        padding-bottom: 12px;
+        padding: 8px 8px 12px 8px;
         border-radius: 12px; /* حواف أنعم تتلاءم مع حجم الشاشة */
     }
 
     .product-image {
-        padding: 8px; /* تقليص الحشو للحفاظ على حجم برطمان المنتج كبيراً وواضحاً */
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
+        padding: 6px; /* تقليص الحشو للحفاظ على حجم برطمان المنتج كبيراً وواضحاً */
+        border-radius: 20px;
     }
 
     .product-name {

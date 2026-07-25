@@ -381,7 +381,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-bottom: 15px;
+    padding: 10px 10px 15px 10px; /* حشو من فوق كمان عشان زوايا الصورة الدائرية تبان واضحة على كل الجوانب */
     cursor: pointer;
     transition: transform 0.3s ease;
     flex: 0 0 calc(25% - 15px); 
@@ -398,7 +398,7 @@ body {
 .home-discount-badge {
     position: absolute;
     top: 12px;
-    right: 12px;
+    left: 12px;
     background-color: #fff;
     color: #0d3b1e;
     border: 1px solid #0d3b1e;
@@ -414,8 +414,9 @@ body {
     width: 100%;
     height: 300px;
     object-fit: contain; /* تم التعديل من cover إلى contain لمنع القص */
-    padding: 8px; /* حشو داخلي بسيط لحماية أبعاد الزجاجات */
+    padding: 4px; /* حشو داخلي بسيط لحماية أبعاد الزجاجات */
     background-color: #ece6d3; /* مطابقة لون خلفية الصورة مع الكارت */
+    border-radius: 30px; /* حواف دائرية واضحة للصورة نفسها، أوضح من حواف الكارت */
 }
 
 .home-product-info {
@@ -599,7 +600,7 @@ body {
     width: 230px;
     background-color: #ece6d3; /* توحيد لون الخلفية مع كروت المنتجات */
     border-radius: 16px;
-    padding: 15px;
+    padding: 10px 15px 15px 15px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -637,7 +638,7 @@ body {
     height: 220px; /* توحيد الارتفاع لمنع الاختلافات البصرية */
     display: block;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 24px; /* حواف دائرية أوضح للصورة نفسها */
     margin-bottom: 12px;
 }
 
@@ -645,6 +646,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover; /* التعديل لـ cover لتوحيد المقاسات وإلغاء الفراغات الجانبية وتناسق شكل الصور */
+    border-radius: 24px; /* حواف دائرية مطابقة للصندوق نفسه */
 }
 
 .natural-title {

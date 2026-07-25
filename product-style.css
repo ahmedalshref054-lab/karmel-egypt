@@ -145,6 +145,7 @@ body {
     object-fit: contain; /* يضمن ظهور محتوى الصورة كله من غير أي قص */
     padding: 10px; 
     background-color: #ece6d3;
+    border-radius: 30px; /* حواف دائرية واضحة للصورة نفسها، بدل الحواف الحادة */
 }
 
 .detail-discount-badge {
