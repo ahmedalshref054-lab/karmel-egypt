@@ -28,7 +28,7 @@ body {
 .main-header {
     background-color: #0d3b1e; /* اللون الأخضر الغامق */
     color: #ffffff;
-    padding: 15px 30px;
+    padding: 12px 30px;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -100,7 +100,7 @@ body {
 
 /* اللوجو */
 .logo img {
-    max-height: 50px;
+    max-height: 76px;
     display: block;
 }
 
@@ -292,7 +292,7 @@ body {
     }
 
     .logo img {
-        width: 80px;
+        width: 70px;
     }
 
     .logo {

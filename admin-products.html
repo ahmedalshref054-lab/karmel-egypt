@@ -293,28 +293,37 @@
             margin-bottom: 26px;
         }
         .report-day-title {
-            color: #0d3b1e;
-            font-size: 16px;
-            font-weight: bold;
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 6px;
             margin-bottom: 12px;
-            padding-bottom: 8px;
+            padding-bottom: 12px;
             border-bottom: 2px solid #eae5c8;
             cursor: pointer;
             user-select: none;
         }
+        .report-day-title-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #0d3b1e;
+            font-size: 16px;
+            font-weight: bold;
+        }
         .report-day-title .toggle-arrow {
-            margin-inline-start: auto;
             transition: transform 0.25s ease;
-            color: #999;
+            color: #0d3b1e;
+            font-size: 13px;
         }
         .report-day-block.collapsed .toggle-arrow { transform: rotate(-90deg); }
         .report-day-block.collapsed .report-day-orders { display: none; }
-        .report-day-title .count-badge {
-            background: #0d3b1e; color: #fff; font-size: 11px;
-            padding: 2px 8px; border-radius: 20px; font-weight: normal;
+        .report-day-summary {
+            display: flex;
+            gap: 18px;
+            font-size: 13.5px;
+            color: #555;
+            font-weight: 600;
+            padding-right: 21px; /* يبقى تحت النص بالظبط بعد السهم */
         }
         .report-day-orders {
             display: grid;
@@ -491,7 +500,7 @@
         <header>
             <h1><i class="fa-solid fa-pen-to-square"></i> إدارة البيانات والصور والأسعار</h1>
             <div style="display:flex; gap:10px; align-items:center;">
-                <a href="admin.html"><i class="fa-solid fa-receipt"></i> لوحة الأوردرات</a>
+                <a href="#" onclick="location.reload(); return false;"><i class="fa-solid fa-rotate-right"></i> ريفرش</a>
                 <a href="#" onclick="openAccountSettingsModal(); return false;"><i class="fa-solid fa-user-gear"></i> بيانات الحساب</a>
                 <a href="#" onclick="handleProductsAdminLogout(); return false;"><i class="fa-solid fa-right-from-bracket"></i> تسجيل خروج</a>
             </div>
@@ -963,6 +972,12 @@
         // بدل ما ترجع تتطوي تلقائياً زي أول مرة
         let expandedReportDays = new Set();
 
+        // تحويل مفتاح التاريخ المخزن (YYYY-MM-DD) لشكل أوضح للعرض (DD/MM/YYYY)
+        function formatReportDateKey(dateKey) {
+            const [y, m, d] = dateKey.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
         async function renderReportsView() {
             const wrapper = document.getElementById('reports-wrapper');
             wrapper.innerHTML = '<p style="color:#999; font-size:13px;">جاري تحميل التقارير...</p>';
@@ -979,14 +994,20 @@
             // كل يوم مطوي (collapsed) افتراضياً، إلا لو الأدمن كان فاتحه قبل كده
             wrapper.innerHTML = dateKeys.map(dateKey => {
                 const dayOrders = Object.keys(reports[dateKey]).map(id => reports[dateKey][id]);
+                const dayTotal = dayOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
                 const isExpanded = expandedReportDays.has(dateKey);
                 return `
                     <div class="report-day-block${isExpanded ? '' : ' collapsed'}" id="report-day-${dateKey}">
-                        <h3 class="report-day-title" onclick="toggleReportDay('${dateKey}')">
-                            <i class="fa-solid fa-calendar-day"></i> ${dateKey}
-                            <span class="count-badge">${dayOrders.length}</span>
-                            <i class="fa-solid fa-chevron-down toggle-arrow"></i>
-                        </h3>
+                        <div class="report-day-title" onclick="toggleReportDay('${dateKey}')">
+                            <div class="report-day-title-top">
+                                <i class="fa-solid fa-chevron-down toggle-arrow"></i>
+                                <span>${formatReportDateKey(dateKey)}</span>
+                            </div>
+                            <div class="report-day-summary">
+                                <span>📦 ${dayOrders.length} طلب</span>
+                                <span>💰 ${dayTotal.toLocaleString('ar-EG')} ج.م</span>
+                            </div>
+                        </div>
                         <div class="report-day-orders">
                             ${dayOrders.map(o => renderReportOrderCard(dateKey, o)).join('')}
                         </div>

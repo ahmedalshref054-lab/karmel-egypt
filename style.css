@@ -31,7 +31,7 @@ body {
 .main-header {
     background-color: #0d3b1e;
     color: #ffffff;
-    padding: 15px 30px;
+    padding: 12px 30px; /* رجوع لارتفاع طبيعي بيتحدد من المحتوى مش رقم ثابت مبالغ فيه */
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -51,24 +51,27 @@ body {
     display: flex;
     flex-direction: column; /* جعل الكلمة تحت اللوجو الدائري */
     align-items: center;    /* محاذاة الكلمة بالمنتصف تماماً تحت اللوجو */
-    gap: 4px;               /* مسافة صغيرة جداً وأنيقة بين الصورة والكلمة */
+    justify-content: center;
+    gap: 0px;               /* قربنا الكلمة من اللوجو لفوق شوية */
     text-decoration: none;
 }
 
 .logo img {
-    max-height: 45px; /* حجم متناسق للرص الرأسي */
+    max-height: 76px; /* حجم متناسق للرص الرأسي */
     display: block;
 }
 
 /* تنسيق الكلمة تحت اللوجو للكمبيوتر (مزخرفة، مائلة، وغير عريضة/ليست بولد) */
 .logo-text {
     color: #c5a880; /* لون ذهبي فاخر متناسق مع هوية البراند */
-    font-size: 0.9rem; /* حجم ناعم ومتناسق لكونه تحت اللوجو */
+    font-size: 0.7rem; /* صغرناها شوية عن الحجم اللي كانت عليه */
     font-weight: normal; /* غير عريض (ليست بولد) بناءً على طلبك */
     font-style: italic;  /* مائل ومزخرف */
     font-family: 'Georgia', 'Times New Roman', serif; /* خط كلاسيكي مزخرف وراقي */
     letter-spacing: 1.5px; /* مسافات تباعد أنيقة بين الحروف */
+    margin-top: -3px; /* رفعناها لفوق أقرب للوجو */
 }
+
 
 /* الأيقونات */
 .header-icons {
@@ -131,6 +134,8 @@ body {
 @media (max-width: 768px) {
     .main-header {
         padding: 10px 15px;
+        height: auto; /* الهيدر بيتفتح صفوف على الموبايل (لوجو + منيو) فمينفعش ارتفاع ثابت */
+        overflow: visible;
     }
 
     .header-container {
@@ -140,6 +145,7 @@ body {
         position: relative;
         flex-wrap: wrap;
         row-gap: 12px;
+        height: auto;
     }
 
     /* اللوجو على اليسار في الموبايل */
@@ -1062,6 +1068,8 @@ footer {
 @media (max-width: 768px) {
     .main-header {
         padding: 10px 15px;
+        height: auto; /* الهيدر بيتفتح صفوف على الموبايل (لوجو + منيو) فمينفعش ارتفاع ثابت */
+        overflow: visible;
     }
 
     .header-container {
@@ -1069,10 +1077,12 @@ footer {
         row-gap: 12px;
         justify-content: space-between;
         align-items: center;
+        height: auto;
     }
 
     .logo img {
-        width: 80px;
+        width: 70px;
+        height: auto;
     }
 
     .logo {

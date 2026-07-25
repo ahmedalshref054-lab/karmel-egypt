@@ -183,7 +183,19 @@ function renderOrderCard(order, status) {
     `;
 }
 
+// كود بسيط لتأكيد حذف الطلب - غرضه منع الحذف بالغلط من موظف مستعجل،
+// مش حماية أمنية حقيقية (الحماية الفعلية متغطية بتسجيل دخول الأدمن أصلاً)
+const DELETE_ORDER_PIN = '2026';
+
 function confirmDeleteOrder(orderId) {
+    const enteredPin = prompt('اكتب كود حذف الطلب للتأكيد:');
+    if (enteredPin === null) return; // اتضغط "إلغاء"
+
+    if (enteredPin !== DELETE_ORDER_PIN) {
+        alert('الكود غلط، لم يتم حذف الطلب.');
+        return;
+    }
+
     if (confirm('متأكد إنك عايز تحذف الطلب ده؟ الحذف نهائي ومش هيرجع تاني.')) {
         deleteOrder(orderId);
     }
