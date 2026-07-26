@@ -142,14 +142,10 @@ function applyProfessionalStyles() {
     }
 }
 
-// تشغيل صفحة تفاصيل المنتج - بانتظار أحدث بيانات من السيرفر قبل أي عرض
+// تشغيل صفحة تفاصيل المنتج - بانتظار أحدث بيانات من السيرفر مرة واحدة بس قبل أي عرض
 // (بدل عرض النسخة القديمة المحفوظة محلياً الأول ثم استبدالها، وده كان بيسبب "ومضة" للبيانات القديمة)
 document.addEventListener("DOMContentLoaded", async () => {
     if (typeof initializeAndLoadProducts !== 'undefined') {
-        // أي تعديل لحظي لنفس المنتج بعد كده (سعر، وصف، إخفاء) هيحدث الصفحة تلقائياً من غير Refresh
-        if (typeof onLiveProductsUpdate === 'function') {
-            onLiveProductsUpdate(renderProductDetails);
-        }
         try {
             await initializeAndLoadProducts();
         } catch (error) {

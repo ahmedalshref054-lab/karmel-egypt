@@ -129,13 +129,20 @@ body {
 }
 
 #sort-select {
-    padding: 8px 15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none; /* إخفاء السهم الافتراضي للمتصفح عشان نتحكم في مكانه بالظبط */
+    padding: 8px 38px 8px 15px; /* مسافة إضافية على الشمال عشان تفضل فاضية للسهم المخصص */
     border-radius: 8px;
     border: 1px solid #ddd;
     background-color: #fff;
     font-size: 0.9rem;
     outline: none;
     cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d3b1e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 14px center;
+    background-size: 13px;
 }
 
 /* شبكة المنتجات (الكمبيوتر) */
@@ -148,7 +155,7 @@ body {
 /* ستايل كارت المنتج المطور */
 .product-card {
     background-color: #ece6d3; /* الخلفية البيج الفاتحة للكارت */
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.03);
@@ -186,7 +193,7 @@ body {
     object-fit: contain; /* يضمن ظهور البرطمان كاملاً دون قص غطائه أو قاعدته */
     padding: 10px; /* حشو داخلي يمنع التصاق حواف الصورة بأطراف الكارت */
     background-color: #ece6d3; /* الحفاظ على نفس الخلفية البيج المريحة للعين */
-    border-radius: 28px; /* حواف دائرية واضحة للصورة نفسها على كل الجوانب، أوضح من حواف الكارت */
+    border-radius: 20px; /* حواف دائرية موحدة مع باقي كروت الموقع */
 }
 
 /* تفاصيل الكارت (الأسماء والأسعار) */
@@ -315,8 +322,10 @@ body {
     }
 
     #sort-select {
-        padding: 6px 12px;
+        padding: 6px 32px 6px 12px;
         font-size: 0.85rem;
+        background-position: left 11px center;
+        background-size: 11px;
     }
 
     /* إجبار شبكة المنتجات على البقاء كصفين (2 Columns) متقاربين لمظهر ممتاز */
@@ -328,12 +337,12 @@ body {
     /* كارت المنتج على الموبايل */
     .product-card {
         padding: 8px 8px 12px 8px;
-        border-radius: 12px; /* حواف أنعم تتلاءم مع حجم الشاشة */
+        border-radius: 16px; /* حواف أنعم تتلاءم مع حجم الشاشة، بنفس النسبة الموحدة */
     }
 
     .product-image {
         padding: 6px; /* تقليص الحشو للحفاظ على حجم برطمان المنتج كبيراً وواضحاً */
-        border-radius: 20px;
+        border-radius: 16px;
     }
 
     .product-name {

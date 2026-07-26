@@ -169,12 +169,18 @@ function renderOrderCard(order, status) {
         actionButtons += `<button class="advance-btn move-to-report-btn" onclick="moveToReport('${order.id}')">نقل للتقرير <i class="fa-solid fa-arrow-down"></i></button>`;
     }
 
+    // تنبيه بصري بسيط لو الأوردر ده لسه محتاج تأكيد استلام دفع (تحويل إنستا باي/فودافون كاش)
+    const paymentPendingBadge = order.paymentStatus === 'pending'
+        ? `<p style="background:#fff4e5; color:#b8860b; font-size:12px; font-weight:bold; padding:5px 8px; border-radius:6px; margin-bottom:8px;"><i class="fa-solid fa-clock"></i> بانتظار تأكيد الدفع</p>`
+        : '';
+
     return `
         <div class="order-card">
             <div class="order-card-top">
                 <span class="order-id">${order.id}</span>
                 <span class="order-time">${formatOrderDate(order.createdAt)}</span>
             </div>
+            ${paymentPendingBadge}
             <p class="order-customer-name"><i class="fa-solid fa-user"></i> ${order.customer.name}</p>
             <p class="order-total"><i class="fa-solid fa-sack-dollar"></i> ${order.total} ج.م</p>
             <div class="order-card-actions">${actionButtons}</div>
@@ -207,6 +213,13 @@ async function deleteOrder(orderId) {
 }
 
 async function moveOrder(orderId, newStatus) {
+    if (newStatus === 'preparing') {
+        const order = ordersCache.find(o => o.id === orderId);
+        if (order && order.paymentStatus === 'pending') {
+            const proceed = confirm('الطلب ده لسه دفعه متأكدش (تحويل لسه معلق). عايز تكمل من غير ما تأكد الدفع؟');
+            if (!proceed) return;
+        }
+    }
     await updateOrderStatus(orderId, newStatus);
     renderBoard();
 }
@@ -251,6 +264,26 @@ function renderOrderModalContent(order) {
         </div>
     `).join('');
 
+    // قسم بيانات الدفع: بيظهر بس للأوردرات اللي طريقة دفعها "تحويل"
+    let paymentSectionHTML = '';
+    if (order.paymentMethod === 'transfer') {
+        const proofImageHTML = order.paymentProofImage
+            ? `<a href="${order.paymentProofImage}" target="_blank"><img src="${order.paymentProofImage}" alt="إثبات التحويل" style="max-width:220px; border-radius:8px; border:1px solid #ddd; display:block; margin:10px 0;"></a>`
+            : `<p style="color:#d81b1b; font-size:13px;">⚠️ العميل ماحملش صورة إثبات التحويل</p>`;
+
+        const confirmButtonHTML = order.paymentStatus === 'pending'
+            ? `<button class="whatsapp-contact-btn" style="background:#0d3b1e;" onclick="confirmPayment('${order.id}')"><i class="fa-solid fa-check"></i> تأكيد استلام الدفع</button>`
+            : `<p style="color:#0d3b1e; font-weight:bold; font-size:13px;"><i class="fa-solid fa-circle-check"></i> تم تأكيد الدفع</p>`;
+
+        paymentSectionHTML = `
+            <div class="modal-section">
+                <h3><i class="fa-solid fa-credit-card"></i> بيانات الدفع (تحويل)</h3>
+                ${proofImageHTML}
+                ${confirmButtonHTML}
+            </div>
+        `;
+    }
+
     document.getElementById('order-modal-content').innerHTML = `
         <h2>تفاصيل الطلب ${order.id}</h2>
         <p class="modal-order-date">${formatOrderDate(order.createdAt)}</p>
@@ -266,6 +299,8 @@ function renderOrderModalContent(order) {
             </button>
         </div>
 
+        ${paymentSectionHTML}
+
         <div class="modal-section">
             <h3><i class="fa-solid fa-bag-shopping"></i> المنتجات</h3>
             ${itemsHTML}
@@ -279,6 +314,18 @@ function renderOrderModalContent(order) {
     `;
 
     document.getElementById('order-modal-overlay').classList.add('active');
+}
+
+// تأكيد استلام الدفع لأوردر تحويل - بيحدث الحالة سحابياً، وبيعيد رسم المودال فوراً بدون إغلاقه
+async function confirmPayment(orderId) {
+    await updatePaymentStatus(orderId, 'verified');
+
+    // تحديث النسخة المحلية عشان المودال يتحدث فوراً من غير ما نستنى الـ listener اللحظي
+    const cachedOrder = ordersCache.find(o => o.id === orderId);
+    if (cachedOrder) {
+        cachedOrder.paymentStatus = 'verified';
+        renderOrderModalContent(cachedOrder);
+    }
 }
 
 function closeOrderModal() {

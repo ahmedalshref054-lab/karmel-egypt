@@ -1385,9 +1385,8 @@
             updateStats();
         }
 
-        // 🖼️ إعدادات Cloudinary لرفع الصور (بدل تحويلها base64 وتخزينها كاملة جوه الداتابيز)
-        const CLOUDINARY_CLOUD_NAME = "yd0zkpcl";
-        const CLOUDINARY_UPLOAD_PRESET = "qhvtk7b2";
+        // 🖼️ إعدادات Cloudinary لرفع الصور - متعرّفة أصلاً في script.js (بيتحمّل قبل الكود ده)
+        // فمش محتاجين نعيد تعريفها هنا تاني (كان ده سبب الـ SyntaxError اللي بيوقف الصفحة)
 
         async function uploadImageFromDevice(catKey, itemIndex, inputElement, imgPreviewId) {
             const file = inputElement.files[0];

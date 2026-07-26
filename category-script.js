@@ -77,21 +77,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 3. في الخلفية، اطلب من السيرفر تحديث الأسعار دون تعطيل الزائر
+    // 3. في الخلفية، اطلب من السيرفر أحدث نسخة مرة واحدة بس (get) وحدّث الكروت بصمت
+    //    لو لقى تغيير - من غير أي اتصال لحظي/Listener بعد كده
     if (typeof initializeAndLoadProducts !== 'undefined') {
-        // أي تعديل لحظي بعد كده (سعر، إخفاء منتج، إلخ) هيرسم الشبكة تلقائياً من غير Refresh
-        if (typeof onLiveProductsUpdate === 'function') {
-            onLiveProductsUpdate(() => {
-                const liveCategory = allProductsMasterData[categoryType] || allProductsMasterData['natural'];
-                currentCategoryItems = sortItems(liveCategory.items, sortSelect ? sortSelect.value : 'latest');
-                renderProductsGrid(currentCategoryItems);
-            });
-        }
-
         initializeAndLoadProducts().then(() => {
             // تحديث صامت للكروت بالأسعار الجديدة في حال وجود أي تحديث سحابي
             const updatedCategory = allProductsMasterData[categoryType] || allProductsMasterData['natural'];
-            currentCategoryItems = updatedCategory.items;
+            currentCategoryItems = sortItems(updatedCategory.items, sortSelect ? sortSelect.value : 'latest');
             renderProductsGrid(currentCategoryItems);
         });
     }

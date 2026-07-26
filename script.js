@@ -179,6 +179,29 @@ const categoryCardsData = {
 /* 🔗 ضع رابط الفايربيز الأزرق الخاص بك هنا بدلاً من الكلمة المكتوبة */
 const FIREBASE_DB_URL = "https://karmel-98999-default-rtdb.firebaseio.com/"; 
 
+// نفس إعدادات Cloudinary المستخدمة في رفع صور المنتجات - بريسيت عام (unsigned)
+// آمن الاستخدام من صفحة العميل مباشرة (مصمم أصلاً لرفع من الفرونت إند)
+const CLOUDINARY_CLOUD_NAME = "yd0zkpcl";
+const CLOUDINARY_UPLOAD_PRESET = "qhvtk7b2";
+
+// دالة عامة لرفع أي صورة على Cloudinary، بترجع الرابط النهائي أو ترمي error لو فشلت
+async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: "POST",
+        body: formData
+    });
+    const result = await response.json();
+
+    if (!response.ok || !result.secure_url) {
+        throw new Error((result.error && result.error.message) || "فشل رفع الصورة لسبب غير معروف");
+    }
+    return result.secure_url;
+}
+
 // جلب الأوردرات من السحابة لمرة واحدة (تُستخدم في المودال وأماكن الطلب لحظة الحاجة فقط)
 async function getOrders() {
     try {
@@ -290,6 +313,20 @@ async function updateOrderStatus(orderId, newStatus) {
         });
     } catch (error) {
         console.error("Error updating order status:", error);
+    }
+}
+
+// تأكيد استلام الدفع لأوردر تم دفعه بتحويل (إنستا باي / فودافون كاش) - محتاج توكن أدمن
+async function updatePaymentStatus(orderId, newPaymentStatus) {
+    try {
+        const authQuery = await buildAdminAuthQuery();
+        await fetch(`${FIREBASE_DB_URL}orders/${orderId}/paymentStatus.json${authQuery}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newPaymentStatus)
+        });
+    } catch (error) {
+        console.error("Error updating payment status:", error);
     }
 }
 
@@ -455,6 +492,7 @@ async function saveOrderToGoogleSheets(order) {
                 quantity: item.quantity
             })),
             shippingCost: order.shippingCost || 0,
+            paymentMethod: order.paymentMethod || 'cod',
             total: order.total
         };
 
@@ -486,7 +524,7 @@ async function saveOrderToGoogleSheets(order) {
    ============================================================ *//* ============================================================
    إرسال الطلب وإدخاله للآدمن وللشيت (إصدار الاستقرار التام)
    ============================================================ */
-async function sendOrderToWhatsApp(customerName, customerPhone, customerAddress, customerGovernorate, shippingCost) {
+async function sendOrderToWhatsApp(customerName, customerPhone, customerAddress, customerGovernorate, shippingCost, paymentMethod, paymentProofImage) {
     const cart = getCart();
     if (cart.length === 0) {
         alert("سلتك فارغة حالياً!");
@@ -509,12 +547,20 @@ async function sendOrderToWhatsApp(customerName, customerPhone, customerAddress,
     const shipping = (typeof shippingCost === 'number' && shippingCost > 0) ? shippingCost : 0;
     const totalPrice = productsTotal + shipping;
     const orderId = 'KM-' + Math.floor(1000 + Math.random() * 9000);
+
+    // طريقة الدفع: 'cod' (عند الاستلام، الافتراضي) أو 'transfer' (إنستا باي/فودافون كاش)
+    const method = paymentMethod || 'cod';
+    // حالة الدفع: التحويلات محتاجة تأكيد يدوي من الكول سنتر قبل ما تُعتبر مؤكدة
+    const paymentStatus = method === 'transfer' ? 'pending' : 'cod';
+
     const newOrder = {
         id: orderId,
         createdAt: new Date().toISOString(),
         status: 'incoming',
         total: totalPrice,
         shippingCost: shipping,
+        paymentMethod: method,
+        paymentStatus: paymentStatus,
         customer: {
             name: customerName,
             phone: customerPhone,
@@ -523,6 +569,11 @@ async function sendOrderToWhatsApp(customerName, customerPhone, customerAddress,
         },
         items: cart
     };
+
+    // نضيف رابط صورة إثبات التحويل بس لو فعلاً موجودة (عشان منحطش حقل فاضي في الأوردرات العادية)
+    if (method === 'transfer' && paymentProofImage) {
+        newOrder.paymentProofImage = paymentProofImage;
+    }
 
     try {
         // 1. حفظ الطلب سحابياً في الفايربيز للوحة التحكم الأصلية
@@ -837,55 +888,17 @@ function applyCloudProducts(cloudProducts) {
     }
 }
 
-let productsListenerStarted = false;
-const productsUpdateCallbacks = [];
-
-// أي صفحة عايزة تعيد رسم نفسها تلقائياً كل ما سعر أو منتج يتغير لحظياً، تسجل دالتها هنا
-function onLiveProductsUpdate(callback) {
-    productsUpdateCallbacks.push(callback);
-}
-
 /**
- * بتاخد أول نسخة من بيانات المنتجات (وترجع Promise بتتحل بمجرد وصولها، تماماً
- * زي القديمة عشان الصفحات الحالية تفضل شغالة زي ما هي)، وبعد كده بتفضل مستمعة
- * لأي تغيير لحظي وتنادي أي دالة اتسجلت عن طريق onLiveProductsUpdate تلقائياً.
- *
- * لو Firebase Database SDK مش محمّل في الصفحة دي لأي سبب، بترجع تلقائياً لطلب
- * REST عادي لمرة واحدة (تحديث لحظي مش هيشتغل في الحالة دي بس الصفحة تفضل شغالة).
+ * بتجيب أحدث نسخة من بيانات المنتجات من فايربيز مرة واحدة بس (REST عادي عن
+ * طريق fetch، من غير ما تفتح أي اتصال لحظي/Listener). بترجع Promise بتتحل
+ * بمجرد وصول الرد، فالصفحة بتاخد آخر تحديث عمله صاحب المعرض وقت ما اتفتحت
+ * أو وقت ما العميل يعمل Refresh - وبس، من غير أي استهلاك إضافي بعد كده.
  */
 function initializeAndLoadProducts() {
-    return new Promise((resolve) => {
-        if (typeof firebase === 'undefined' || !firebase.database) {
-            fetch(`${FIREBASE_DB_URL}products.json`)
-                .then(res => res.json())
-                .then(cloudProducts => { applyCloudProducts(cloudProducts); resolve(); })
-                .catch(error => { console.error("خطأ في الاتصال بالسيرفر:", error); resolve(); });
-            return;
-        }
-
-        if (productsListenerStarted) {
-            resolve();
-            return;
-        }
-        productsListenerStarted = true;
-
-        let isFirstSnapshot = true;
-        firebase.database().ref('products').on('value', (snapshot) => {
-            applyCloudProducts(snapshot.val());
-            if (isFirstSnapshot) {
-                isFirstSnapshot = false;
-                resolve();
-            } else {
-                // تحديث لحظي فعلي: بيحصل تلقائياً كل ما الأدمن يغيّر سعر أو منتج
-                productsUpdateCallbacks.forEach(cb => {
-                    try { cb(); } catch (e) { console.error(e); }
-                });
-            }
-        }, (error) => {
-            console.error("خطأ في الاتصال اللحظي بقاعدة البيانات:", error);
-            resolve();
-        });
-    });
+    return fetch(`${FIREBASE_DB_URL}products.json`)
+        .then(res => res.json())
+        .then(cloudProducts => { applyCloudProducts(cloudProducts); })
+        .catch(error => { console.error("خطأ في الاتصال بالسيرفر:", error); });
 }
 
 /* ============================================================
@@ -901,46 +914,11 @@ function applyCloudCategoryCards(cloudData) {
     }
 }
 
-let categoryCardsListenerStarted = false;
-const categoryCardsUpdateCallbacks = [];
-
-// أي صفحة عايزة تعيد رسم كروت الأقسام تلقائياً كل ما تتغير لحظياً، تسجل دالتها هنا
-function onLiveCategoryCardsUpdate(callback) {
-    categoryCardsUpdateCallbacks.push(callback);
-}
-
 function initializeAndLoadCategoryCards() {
-    return new Promise((resolve) => {
-        if (typeof firebase === 'undefined' || !firebase.database) {
-            fetch(`${FIREBASE_DB_URL}categoryCards.json`)
-                .then(res => res.json())
-                .then(cloudData => { applyCloudCategoryCards(cloudData); resolve(); })
-                .catch(error => { console.error("خطأ في الاتصال بالسيرفر:", error); resolve(); });
-            return;
-        }
-
-        if (categoryCardsListenerStarted) {
-            resolve();
-            return;
-        }
-        categoryCardsListenerStarted = true;
-
-        let isFirstSnapshot = true;
-        firebase.database().ref('categoryCards').on('value', (snapshot) => {
-            applyCloudCategoryCards(snapshot.val());
-            if (isFirstSnapshot) {
-                isFirstSnapshot = false;
-                resolve();
-            } else {
-                categoryCardsUpdateCallbacks.forEach(cb => {
-                    try { cb(); } catch (e) { console.error(e); }
-                });
-            }
-        }, (error) => {
-            console.error("خطأ في الاتصال اللحظي ببيانات الحاويات:", error);
-            resolve();
-        });
-    });
+    return fetch(`${FIREBASE_DB_URL}categoryCards.json`)
+        .then(res => res.json())
+        .then(cloudData => { applyCloudCategoryCards(cloudData); })
+        .catch(error => { console.error("خطأ في الاتصال بالسيرفر:", error); });
 }
 
 // بترسم كروت الأقسام الأربعة في الصفحة الرئيسية بناءً على categoryCardsData الحالية
@@ -1069,17 +1047,18 @@ function renderHomePageProducts() {
     }
 }
 
-// تحميل فوري من الكاش أولاً، ثم تحديث في الخلفية بهدوء، وبعد كده أي تحديث لحظي هيرسم الصفحة تلقائياً
+// تحميل مرة واحدة بس: نعرض فوراً من آخر نسخة محفوظة محلياً (لو موجودة)،
+// وبعدين نجيب أحدث نسخة من السيرفر مرة واحدة (get) ونعيد الرسم بيها.
+// أي تعديل بعد كده من صاحب المعرض هيظهر عند العميل التالي اللي يفتح الصفحة
+// أو يعمل Refresh - مفيش أي اتصال لحظي هنا بقصد تقليل استهلاك Firebase.
 document.addEventListener("DOMContentLoaded", () => {
     renderHomePageProducts(); // ارسم الكروت فوراً بالأسعار المحفوظة بـ 0 ثانية تأخير
-    onLiveProductsUpdate(renderHomePageProducts); // أي تعديل من الداشبورد بعد كده هيرسم الصفحة تلقائياً بدون Refresh
     initializeAndLoadProducts().then(() => {
-        renderHomePageProducts(); // أعد الرسم فور وصول أول نسخة فعلية من السيرفر
+        renderHomePageProducts(); // أعد الرسم فور وصول أحدث نسخة من السيرفر
     });
 
     // كروت الأقسام (الحاويات) - نفس المنطق بالظبط
     renderCategoryCards();
-    onLiveCategoryCardsUpdate(renderCategoryCards);
     initializeAndLoadCategoryCards().then(() => {
         renderCategoryCards();
     });

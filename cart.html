@@ -149,6 +149,75 @@
         }
         .submit-order-btn:hover { background-color: #14301b; }
         .empty-cart-msg { text-align: center; padding: 40px 0; font-size: 18px; color: #666; }
+
+        /* ===== قسم طريقة الدفع ===== */
+        .payment-method-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .payment-method-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+        .payment-method-option input { margin: 0; }
+        .payment-method-option.active {
+            border-color: #1b3c24;
+            background: #f4f2ec;
+        }
+        .transfer-details-box {
+            display: none;
+            background: #f9f8f4;
+            border: 1px dashed #c5a880;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 15px;
+            font-size: 13.5px;
+            color: #444;
+            line-height: 1.8;
+        }
+        .transfer-details-box a {
+            color: #1b3c24;
+            font-weight: bold;
+            word-break: break-all;
+        }
+        .payment-proof-upload-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px dashed #1b3c24;
+            background: #f4f2ec;
+            color: #1b3c24;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 8px;
+        }
+        .payment-proof-preview {
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .payment-proof-preview img {
+            max-width: 140px;
+            max-height: 140px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .payment-proof-status {
+            font-size: 12.5px;
+            margin-top: 6px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -250,6 +319,38 @@
                 <div class="shipping-fee-box" id="shippingFeeBox">
                     <span>رسوم الشحن (<span id="shippingGovName"></span>):</span>
                     <span id="shippingFeeAmount">0 ج.م</span>
+                </div>
+
+                <!-- طريقة الدفع -->
+                <div class="form-group">
+                    <label>طريقة الدفع:</label>
+                    <div class="payment-method-options">
+                        <label class="payment-method-option active" id="codOptionLabel">
+                            <input type="radio" name="paymentMethod" value="cod" checked onchange="handlePaymentMethodChange()">
+                            الدفع عند الاستلام
+                        </label>
+                        <label class="payment-method-option" id="transferOptionLabel">
+                            <input type="radio" name="paymentMethod" value="transfer" onchange="handlePaymentMethodChange()">
+                            تحويل (إنستا باي / فودافون كاش)
+                        </label>
+                    </div>
+
+                    <!-- تظهر بس لو اختار "تحويل" -->
+                    <div class="transfer-details-box" id="transferDetailsBox">
+                        <p>حوّل مبلغ <strong id="transferAmountText">0 ج.م</strong> على أحد الرقمين التاليين:</p>
+                        <p>📱 فودافون كاش: <strong>01026567131</strong></p>
+                        <p>🔗 إنستا باي: <a href="https://ipn.eg/S/husseinhilalabduls/instapay/2yP0P0" target="_blank">اضغط هنا للتحويل</a></p>
+                        <p>بعد التحويل، ارفع صورة من إيصال أو رسالة تأكيد التحويل:</p>
+
+                        <input type="file" accept="image/*" id="paymentProofInput" style="display:none" onchange="handlePaymentProofUpload(this)">
+                        <button type="button" class="payment-proof-upload-btn" onclick="document.getElementById('paymentProofInput').click()">
+                            <i class="fa-solid fa-upload"></i> ارفع صورة إثبات التحويل
+                        </button>
+                        <p class="payment-proof-status" id="paymentProofStatus"></p>
+                        <div class="payment-proof-preview" id="paymentProofPreview">
+                            <img id="paymentProofPreviewImg" src="" alt="صورة إثبات التحويل">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="total-price-box">
@@ -363,6 +464,13 @@
         function updateGrandTotalDisplay() {
             const totalContainer = document.getElementById('cartTotalPrice');
             totalContainer.innerText = `${lastProductsTotal + selectedShippingCost} ج.م`;
+
+            // لو "تحويل" مختار أصلاً، نحدث المبلغ الظاهر في تعليمات التحويل كمان
+            const transferAmountEl = document.getElementById('transferAmountText');
+            const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
+            if (transferAmountEl && selectedMethod && selectedMethod.value === 'transfer') {
+                transferAmountEl.innerText = totalContainer.innerText;
+            }
         }
 
         // دالة لعرض المنتجات وحساب الإجمالي داخل الصفحة
@@ -427,16 +535,81 @@
             renderCartPage();
         }
 
+        // ===== منطق طريقة الدفع =====
+        let uploadedPaymentProofUrl = null; // بيتملى برابط Cloudinary بعد نجاح الرفع
+        let isUploadingPaymentProof = false;
+
+        function handlePaymentMethodChange() {
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const transferBox = document.getElementById('transferDetailsBox');
+
+            document.getElementById('codOptionLabel').classList.toggle('active', method === 'cod');
+            document.getElementById('transferOptionLabel').classList.toggle('active', method === 'transfer');
+
+            transferBox.style.display = method === 'transfer' ? 'block' : 'none';
+
+            if (method === 'transfer') {
+                document.getElementById('transferAmountText').innerText = document.getElementById('cartTotalPrice').innerText;
+            }
+        }
+
+        async function handlePaymentProofUpload(inputEl) {
+            const file = inputEl.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 5 ميجابايت.");
+                inputEl.value = "";
+                return;
+            }
+
+            const statusEl = document.getElementById('paymentProofStatus');
+            const previewBox = document.getElementById('paymentProofPreview');
+            const previewImg = document.getElementById('paymentProofPreviewImg');
+
+            statusEl.style.color = '#666';
+            statusEl.textContent = 'جاري رفع الصورة... ⏳';
+            isUploadingPaymentProof = true;
+            uploadedPaymentProofUrl = null;
+
+            try {
+                const url = await uploadImageToCloudinary(file); // دالة من script.js
+                uploadedPaymentProofUrl = url;
+                previewImg.src = url;
+                previewBox.style.display = 'block';
+                statusEl.style.color = '#1b3c24';
+                statusEl.textContent = 'تم رفع الصورة بنجاح ✅';
+            } catch (error) {
+                console.error('فشل رفع صورة إثبات الدفع:', error);
+                statusEl.style.color = '#d81b1b';
+                statusEl.textContent = 'فشل رفع الصورة، حاول تاني.';
+            } finally {
+                isUploadingPaymentProof = false;
+            }
+        }
+
         // تشغيل الفورمة عند الضغط على زرار التأكيد
-        function handleCheckout(event) {
+        async function handleCheckout(event) {
             event.preventDefault();
-            
+
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
             const governorate = document.getElementById('custGovernorate').value;
             const address = document.getElementById('custAddress').value;
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
-            sendOrderToWhatsApp(name, phone, address, governorate, selectedShippingCost);
+            if (paymentMethod === 'transfer') {
+                if (isUploadingPaymentProof) {
+                    alert('لسه صورة إثبات التحويل بتترفع، استنى لحظة وحاول تاني.');
+                    return;
+                }
+                if (!uploadedPaymentProofUrl) {
+                    alert('من فضلك ارفع صورة إثبات التحويل قبل تأكيد الطلب.');
+                    return;
+                }
+            }
+
+            sendOrderToWhatsApp(name, phone, address, governorate, selectedShippingCost, paymentMethod, uploadedPaymentProofUrl);
             renderCartPage(); // السلة بتتصفر بعد الإرسال، فبنحدث العرض
         }
 
