@@ -9,44 +9,17 @@
 
    ملحوظة: بيعمل initializeApp خاص بيه، فمينفعش يتحمّل مع firebase-init.js
    في نفس الصفحة (ده بتاع صفحات العميل بس) عشان منعملش تهيئة مرتين.
-
-   ============================================================
-   فصل بيئة Development عن Production:
-   بيتم اختيار قاعدة البيانات تلقائياً حسب الدومين اللي لوحة الأدمن شغالة عليه:
-   - localhost / 127.0.0.1  → مشروع الـ Demo (arab-store-b6f29)
-   - أي دومين تاني (Vercel اللايف) → المشروع الأساسي (karmel-98999)
-   مهم: حسابات الأدمن (الإيميل/الباسورد) مختلفة بين المشروعين، لازم تسجل
-   دخول بحساب الديمو وانت شغال لوكال، وبحساب الأساسي وانت شغال أونلاين.
    ============================================================ */
 
-const isLocalEnvironment =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-
-// المشروع الأساسي (Production) - العملاء الحقيقيين
-const productionFirebaseConfig = {
-    apiKey: "AIzaSyA2sZJJlbtGcCJQXom-DXpjSTSKlvjNblU",
-    authDomain: "karmel-98999.firebaseapp.com",
-    databaseURL: "https://karmel-98999-default-rtdb.firebaseio.com",
-    projectId: "karmel-98999",
-    storageBucket: "karmel-98999.firebasestorage.app",
-    messagingSenderId: "682392453852",
-    appId: "1:682392453852:web:03c7bad2824dd71e14aa19"
+const firebaseConfig = {
+  apiKey: "AIzaSyA2sZJJlbtGcCJQXom-DXpjSTSKlvjNblU",
+  authDomain: "karmel-98999.firebaseapp.com",
+  databaseURL: "https://karmel-98999-default-rtdb.firebaseio.com",
+  projectId: "karmel-98999",
+  storageBucket: "karmel-98999.firebasestorage.app",
+  messagingSenderId: "682392453852",
+  appId: "1:682392453852:web:03c7bad2824dd71e14aa19"
 };
-
-// مشروع الديمو (Development) - للتجربة المحلية بس (localhost)
-const demoFirebaseConfig = {
-    apiKey: "AIzaSyBfLPM_2Xnu7mtzgDac1vQUjp8CI7k8Y7U",
-    authDomain: "arab-store-b6f29.firebaseapp.com",
-    databaseURL: "https://arab-store-b6f29-default-rtdb.firebaseio.com",
-    projectId: "arab-store-b6f29",
-    storageBucket: "arab-store-b6f29.firebasestorage.app",
-    messagingSenderId: "978962812156",
-    appId: "1:978962812156:web:12c5d0f20e39bfbce61b79",
-    measurementId: "G-XZRZ4H0HSD"
-};
-
-const firebaseConfig = isLocalEnvironment ? demoFirebaseConfig : productionFirebaseConfig;
 
 firebase.initializeApp(firebaseConfig);
 const auriaAuth = firebase.auth();

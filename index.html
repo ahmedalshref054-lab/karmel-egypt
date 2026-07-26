@@ -133,7 +133,7 @@
 <div class="products-wrapper">
 <!-- قسم زيوت طبيعية للعناية بالشعر والبشرة -->
 <section class="home-slider-section">
-    <h2 class="section-main-title">زيوت طبيعية للعناية بالشعر </h2>
+    <h2 class="section-main-title">زيوت طبيعية للعناية بالشعر  </h2>
     
     <div class="slider-wrapper">
         <!-- أسهم التنقل -->
@@ -492,9 +492,10 @@
 </footer>
 
 <script src="door.js"></script>
-<!-- ملحوظة: شلنا ملفات Firebase SDK (firebase-app-compat.js / firebase-database-compat.js / firebase-init.js)
-     من هنا، لأن الصفحة بقت بتجيب المنتجات وكروت الأقسام بـ fetch() عادي مرة واحدة بس
-     (مفيش أي اتصال لحظي/Listener هنا)، فمبقتش محتاجة تحميل SDK فايربيز بالكامل خالص -->
+<!-- Firebase SDK (نسخة compat: تعمل بـ script tag عادي) - لازم للتحديث اللحظي للأسعار بدون Refresh -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="firebase-init.js"></script>
 <script src="script.js"></script>
 
 
