@@ -1524,3 +1524,35 @@ footer {
     -webkit-appearance: none;
     display: none;
 }
+
+/* ==========================================================================
+   تكبير صورة المنتج جوه الكارت (حشو أقل حواليها + ارتفاع أكبر شوية)
+   ========================================================================== */
+.home-product-card,
+.natural-card {
+    padding: 8px 8px 15px 8px;
+}
+
+.home-product-image {
+    padding: 0;
+    aspect-ratio: 1 / 1.1;
+}
+
+.natural-img-box {
+    aspect-ratio: 1 / 1.1;
+}
+
+.natural-img-box img {
+    padding: 0;
+}
+
+/* الصورة تملا مساحتها بالكامل في كل الكروت (من غير فراغات بيج حواليها) */
+.home-product-image {
+    object-fit: cover;
+    object-position: center;
+}
+
+.natural-img-box img {
+    object-fit: cover;
+    object-position: center;
+}

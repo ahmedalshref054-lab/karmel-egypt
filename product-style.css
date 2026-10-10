@@ -405,3 +405,84 @@ body {
 .detail-add-btn.detail-buy-btn:hover {
     background-color: #b8996c;
 }
+
+/* ==========================================================================
+   صفحة الشرح: شكل أبسط - حشو أقل، والصورة تملا صندوقها بحواف دائرية
+   ========================================================================== */
+.product-details-container {
+    margin: 25px auto;
+    gap: 18px;
+}
+
+.product-wrapper {
+    grid-template-columns: 0.85fr 1.15fr; /* زي الأصلي: صورة أعرض من التفاصيل */
+    gap: 24px;
+    padding: 14px;
+    border-radius: 20px;
+}
+
+.product-image-box {
+    height: 480px;
+    border-radius: 15px;
+}
+
+.product-image-box img {
+    padding: 10px;
+    object-fit: contain;
+    border-radius: 30px;
+}
+
+.detail-discount-badge {
+    top: 12px;
+    right: 12px;
+}
+
+.product-info-box {
+    gap: 12px;
+    padding: 0 8px;
+}
+
+.product-description-container {
+    gap: 24px;
+    padding: 18px;
+    border-radius: 20px;
+}
+
+.desc-column-right,
+.desc-column-left {
+    gap: 16px;
+}
+
+@media (max-width: 800px) {
+    .product-details-container {
+        margin: 12px 0 !important;
+        gap: 12px;
+    }
+
+    .product-wrapper {
+        grid-template-columns: 1fr;
+        padding: 10px;
+        gap: 14px;
+        border-radius: 16px;
+    }
+
+    .product-image-box {
+        height: 380px;
+        border-radius: 15px;
+    }
+
+    .product-image-box img {
+        padding: 8px;
+        border-radius: 30px;
+    }
+
+    .product-info-box {
+        padding: 0 4px 6px;
+    }
+
+    .product-description-container {
+        padding: 14px 12px !important;
+        gap: 16px !important;
+        border-radius: 16px;
+    }
+}
