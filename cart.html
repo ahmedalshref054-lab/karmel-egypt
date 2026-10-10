@@ -6,7 +6,6 @@
     <title>Karmel Egypt - سلة المشتريات 🛒</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="door.css">
     <style>
         .icon-link { position: relative; }
         #cart-count {
@@ -222,15 +221,6 @@
 </head>
 <body>
 
-    <!-- باب الدخول -->
-    <div id="door-wrap" class="door-active">
-        <div class="door-panel door-left"></div>
-        <div class="door-panel door-right"></div>
-        <div id="door-center">
-            <img src="logo.jpg" alt="Karmel Logo" id="door-logo-img">
-            <p id="door-tagline">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر 🇪🇬</p>
-        </div>
-    </div>
 
 
     <!-- الهيدر الموحد للموقع -->
@@ -277,6 +267,10 @@
                 <div class="form-group">
                     <label for="custPhone">رقم التليفون:</label>
                     <input type="tel" id="custPhone" required placeholder="01xxxxxxxxx" pattern="^01[0-9]{9}$" title="من فضلك اكتب رقم موبايل مصري صحيح (11 رقم يبدأ بـ 01)">
+                </div>
+                <div class="form-group">
+                    <label for="custPhone2">رقم تليفون تاني (اختياري):</label>
+                    <input type="tel" id="custPhone2" placeholder="01xxxxxxxxx" pattern="^01[0-9]{9}$" title="من فضلك اكتب رقم موبايل مصري صحيح (11 رقم يبدأ بـ 01)">
                 </div>
                 <div class="form-group">
                     <label for="custGovernorate">المحافظة:</label>
@@ -331,7 +325,7 @@
                         </label>
                         <label class="payment-method-option" id="transferOptionLabel">
                             <input type="radio" name="paymentMethod" value="transfer" onchange="handlePaymentMethodChange()">
-                            تحويل (إنستا باي / فودافون كاش)
+                            Vodafone Cash or InstaPay
                         </label>
                     </div>
 
@@ -420,7 +414,6 @@
     </div>
 </footer>
     <!-- ربط ملف الـ JS الرئيسي -->
-    <script src="door.js"></script>
     <script src="script.js"></script>
 
     <script>
@@ -475,7 +468,8 @@
 
         // دالة لعرض المنتجات وحساب الإجمالي داخل الصفحة
         function renderCartPage() {
-            const cart = getCart(); // الدالة دي من script.js
+            const buyNowMode = isBuyNowMode(); // من script.js
+            const cart = buyNowMode ? getBuyNowItems() : getCart(); // الدالة دي من script.js
             const listContainer = document.getElementById('cartItemsList');
             
             if (cart.length === 0) {
@@ -516,22 +510,32 @@
 
         // تغيير الكمية من صفحة السلة نفسها
         function changeCartPageQty(productId, delta) {
-            let cart = getCart();
+            const buyNowMode = isBuyNowMode();
+            let cart = buyNowMode ? getBuyNowItems() : getCart();
             const item = cart.find(i => i.id === productId);
             if (!item) return;
             item.quantity += delta;
             if (item.quantity <= 0) {
                 cart = cart.filter(i => i.id !== productId);
             }
-            saveCart(cart);
+            if (buyNowMode) {
+                saveBuyNowItems(cart);
+            } else {
+                saveCart(cart);
+            }
             renderCartPage();
         }
 
         // حذف منتج من السلة وإعادة التحديث
         function removeCartItem(productId) {
-            let cart = getCart();
+            const buyNowMode = isBuyNowMode();
+            let cart = buyNowMode ? getBuyNowItems() : getCart();
             cart = cart.filter(item => item.id !== productId);
-            saveCart(cart);
+            if (buyNowMode) {
+                saveBuyNowItems(cart);
+            } else {
+                saveCart(cart);
+            }
             renderCartPage();
         }
 
@@ -594,6 +598,7 @@
 
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
+            const phone2 = document.getElementById('custPhone2').value.trim();
             const governorate = document.getElementById('custGovernorate').value;
             const address = document.getElementById('custAddress').value;
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
@@ -609,7 +614,7 @@
                 }
             }
 
-            sendOrderToWhatsApp(name, phone, address, governorate, selectedShippingCost, paymentMethod, uploadedPaymentProofUrl);
+            sendOrderToWhatsApp(name, phone, address, governorate, selectedShippingCost, paymentMethod, uploadedPaymentProofUrl, phone2);
             renderCartPage(); // السلة بتتصفر بعد الإرسال، فبنحدث العرض
         }
 

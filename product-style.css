@@ -394,3 +394,14 @@ body {
         padding: 0 !important;
     }
 }
+
+/* زر اشتر الآن تحت زر إضافة للسلة في صفحة الشرح */
+.detail-add-btn.detail-buy-btn {
+    background-color: #c5a880;
+    color: #0d3b1e;
+    margin-top: 10px;
+}
+
+.detail-add-btn.detail-buy-btn:hover {
+    background-color: #b8996c;
+}

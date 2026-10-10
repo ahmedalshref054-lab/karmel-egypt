@@ -1232,3 +1232,295 @@ footer {
         width: 100%;
     }
 }
+
+/* ==========================================================================
+   زر اشتر الآن (تحت زر إضافة للسلة في كل الكروت)
+   ========================================================================== */
+.cart-add-btn.buy-now-btn {
+    background-color: #c5a880;
+    color: #0d3b1e;
+    margin-top: 8px;
+}
+
+.home-product-info .cart-add-btn.buy-now-btn,
+.natural-card .cart-add-btn.buy-now-btn {
+    margin-top: 8px;
+}
+
+.cart-add-btn.buy-now-btn:hover {
+    background-color: #b8996c;
+}
+
+/* ==========================================================================
+   توحيد شكل كروت المنتجات في الموقع كله (الرئيسية = جوه الأقسام)
+   - نفس الأبعاد والخطوط والأزرار في كل مكان
+   - height:100% كانت بتمنع الكروت من التمدد جوه السلايدر، فالكارت اللي فيه زرار واحد
+     ("سيتوفر قريباً") كان بيطلع أقصر من اللي حواليه. دلوقتي كل كروت الصف بنفس الطول
+   ========================================================================== */
+.home-product-card,
+.natural-card {
+    background-color: #ece6d3;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+    padding: 10px 10px 15px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: auto;
+    align-self: stretch;
+    box-sizing: border-box;
+}
+
+.natural-card {
+    width: 240px;
+}
+
+/* شارة الخصم */
+.home-discount-badge,
+.natural-badge {
+    top: 12px;
+    left: 12px;
+    background-color: #fff;
+    color: #0d3b1e;
+    border: 1px solid #0d3b1e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    z-index: 5;
+}
+
+/* الصورة: مربعة بالكامل بدون قص */
+.home-product-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    padding: 10px;
+    background-color: #ece6d3;
+    border-radius: 20px;
+    box-sizing: border-box;
+}
+
+.natural-img-box {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin-bottom: 0;
+    background-color: #ece6d3;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.natural-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 20px;
+}
+
+/* الاسم والسعر */
+.home-product-info {
+    padding: 15px 10px;
+}
+
+.home-product-name,
+.natural-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0d3b1e;
+    line-height: 1.25;
+    min-height: 2.75rem; /* مساحة سطرين دايماً عشان السعر والأزرار يبدأوا من نفس المكان */
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.natural-title {
+    width: 100%;
+    margin-top: 15px;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+.home-product-prices,
+.natural-price-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.natural-price-box {
+    flex-direction: row-reverse; /* السعر القديم يمين والجديد شماله، زي باقي الكروت */
+}
+
+.home-old-price,
+.nat-old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 0.9rem;
+}
+
+.home-new-price,
+.nat-new-price {
+    color: #0d3b1e;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+/* الأزرار: نفس شكل أزرار الأقسام (بيضاوي، 85% من العرض، في النص) */
+.home-product-info .cart-add-btn,
+.natural-card .cart-add-btn {
+    width: 85%;
+    align-self: center;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: normal;
+}
+
+.home-product-info .cart-add-btn.buy-now-btn,
+.natural-card .cart-add-btn.buy-now-btn {
+    margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+    .natural-card {
+        width: 250px;
+    }
+}
+
+/* ==========================================================================
+   نافذة البحث في المنتجات
+   ========================================================================== */
+#site-search-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 59, 30, 0.55);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 70px 15px 15px;
+    box-sizing: border-box;
+}
+
+#site-search-overlay.open {
+    display: flex;
+}
+
+.site-search-panel {
+    background: #fcfaf6;
+    width: 100%;
+    max-width: 560px;
+    max-height: calc(100vh - 100px);
+    border-radius: 18px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    direction: rtl;
+}
+
+.site-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e6dfcb;
+    color: #0d3b1e;
+}
+
+.site-search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1.05rem;
+    font-family: inherit;
+    color: #0d3b1e;
+    min-width: 0;
+}
+
+.site-search-close {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    line-height: 1;
+    color: #0d3b1e;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.site-search-results {
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.site-search-hint {
+    text-align: center;
+    color: #888;
+    padding: 25px 10px;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.site-search-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #0d3b1e;
+    transition: background 0.2s;
+}
+
+.site-search-item:hover {
+    background: #ece6d3;
+}
+
+.site-search-item img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    background: #ece6d3;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.site-search-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.site-search-item-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.site-search-item-meta {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.site-search-item-price {
+    font-weight: bold;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.site-search-bar input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    display: none;
+}

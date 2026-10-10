@@ -390,3 +390,36 @@ body {
         padding: 0 !important;
     }
 }
+
+/* زر اشتر الآن تحت زر إضافة للسلة */
+.add-to-cart-btn.buy-now-btn-cat {
+    background-color: #c5a880;
+    color: #0d3b1e;
+    margin-top: 8px;
+}
+
+.add-to-cart-btn.buy-now-btn-cat:hover {
+    background-color: #b8996c;
+}
+
+
+/* ==========================================================================
+   توحيد مع كروت الرئيسية: الاسم يحجز سطرين دايماً، والأزرار في نص الكارت
+   ========================================================================== */
+.product-name {
+    line-height: 1.25;
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-to-cart-btn {
+    align-self: center;
+}
+
+@media (max-width: 900px) {
+    .product-name {
+        min-height: 2.4rem;
+    }
+}

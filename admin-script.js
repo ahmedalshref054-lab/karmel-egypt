@@ -292,6 +292,7 @@ function renderOrderModalContent(order) {
             <h3><i class="fa-solid fa-user"></i> بيانات العميل</h3>
             <p><strong>الاسم:</strong> ${order.customer.name}</p>
             <p><strong>الهاتف:</strong> ${order.customer.phone}</p>
+            ${order.customer.phone2 ? `<p><strong>هاتف تاني:</strong> ${order.customer.phone2}</p>` : ''}
             <p><strong>المحافظة:</strong> ${order.customer.governorate || '-'}</p>
             <p><strong>العنوان:</strong> ${order.customer.address}</p>
             <button class="whatsapp-contact-btn" onclick="openWhatsAppChat('${order.customer.phone}', 'أهلاً ${order.customer.name}، بخصوص طلبك رقم ${order.id} من كارميل مصر...')">

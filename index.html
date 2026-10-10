@@ -7,20 +7,10 @@
     <link rel="stylesheet" href="style.css">
     <!-- أيقونات حوض البحث والسلة (FontAwesome كمثال) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="door.css">
 
 </head>
 <body>
 
-    <!-- باب الدخول -->
-    <div id="door-wrap" class="door-active">
-        <div class="door-panel door-left"></div>
-        <div class="door-panel door-right"></div>
-        <div id="door-center">
-            <img src="logo.jpg" alt="Karmel Logo" id="door-logo-img">
-            <p id="door-tagline">شركة مرخصة في صناعة جميع المنتجات الطبيعية في مصر 🇪🇬</p>
-        </div>
-    </div>
     
     <!-- الهيدر ونظام التنقل -->
 <header class="main-header">
@@ -151,6 +141,7 @@
                         <span class="home-new-price">450 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('oils', 'o_rosemary', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('oils', 'o_rosemary', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -165,6 +156,7 @@
                         <span class="home-new-price">210 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('oils', 'o_jojoba', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('oils', 'o_jojoba', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -179,6 +171,7 @@
                         <span class="home-new-price">220 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('oils', 'o_almond', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('oils', 'o_almond', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -193,6 +186,7 @@
                         <span class="home-new-price">325 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('oils', 'o_karmel', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('oils', 'o_karmel', event)">اشتر الآن</button>
                 </div>
             </div>
         </div>
@@ -226,6 +220,7 @@
                         <span class="home-new-price">999 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('boxes', 'b_power', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('boxes', 'b_power', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -240,6 +235,7 @@
                         <span class="home-new-price">1349 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('boxes', 'b_hair', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('boxes', 'b_hair', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -254,6 +250,7 @@
                         <span class="home-new-price">1999 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('boxes', 'b_karmel_full', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('boxes', 'b_karmel_full', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -268,6 +265,7 @@
                         <span class="home-new-price">999 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('boxes', 'b_nutrition', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('boxes', 'b_nutrition', event)">اشتر الآن</button>
                 </div>
             </div>
         </div>
@@ -303,6 +301,7 @@
                         <span class="home-new-price">599 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('packages', 'p_sadr_tamer', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('packages', 'p_sadr_tamer', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -317,6 +316,7 @@
                         <span class="home-new-price">799 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('packages', 'p_sadr_mashat', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('packages', 'p_sadr_mashat', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -331,6 +331,7 @@
                         <span class="home-new-price">599 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('packages', 'p_sadr_moringa', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('packages', 'p_sadr_moringa', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -345,6 +346,7 @@
                         <span class="home-new-price">599 ج.م</span>
                     </div>
                     <button class="cart-add-btn" onclick="addToCart('packages', 'p_sadr_henna', event)">إضافة للسلة</button>
+                    <button class="cart-add-btn buy-now-btn" onclick="buyNow('packages', 'p_sadr_henna', event)">اشتر الآن</button>
                 </div>
             </div>
 
@@ -384,6 +386,7 @@
                     <span class="nat-old-price">600 ج.م</span>
                 </div>
                 <button class="cart-add-btn" onclick="addToCart('natural', 'prod_henna', event)">إضافة للسلة 🛒</button>
+                <button class="cart-add-btn buy-now-btn" onclick="buyNow('natural', 'prod_henna', event)">اشتر الآن</button>
             </div>
 
 
@@ -399,6 +402,7 @@
                     <span class="nat-old-price">699 ج.م</span>
                 </div>
                 <button class="cart-add-btn" onclick="addToCart('natural', 'prod_mashat_brown', event)">إضافة للسلة</button>
+                <button class="cart-add-btn buy-now-btn" onclick="buyNow('natural', 'prod_mashat_brown', event)">اشتر الآن</button>
             </div>
 
             <!-- 4. كارت سدر مطحون -->
@@ -413,6 +417,7 @@
                     <span class="nat-old-price">450 ج.م</span>
                 </div>
                 <button class="cart-add-btn" onclick="addToCart('natural', 'prod_sadr_pure', event)">إضافة للسلة</button>
+                <button class="cart-add-btn buy-now-btn" onclick="buyNow('natural', 'prod_sadr_pure', event)">اشتر الآن</button>
             </div>
 
             <!-- 5. كارت ماسك السدر -->
@@ -427,6 +432,7 @@
                     <span class="nat-old-price">599 ج.m</span>
                 </div>
                 <button class="cart-add-btn" onclick="addToCart('natural', 'prod_sadr_mask', event)">إضافة للسلة</button>
+                <button class="cart-add-btn buy-now-btn" onclick="buyNow('natural', 'prod_sadr_mask', event)">اشتر الآن</button>
             </div>
 
         </div>
@@ -491,7 +497,6 @@
     </div>
 </footer>
 
-<script src="door.js"></script>
 <!-- Firebase SDK (نسخة compat: تعمل بـ script tag عادي) - لازم للتحديث اللحظي للأسعار بدون Refresh -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>

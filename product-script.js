@@ -19,6 +19,8 @@ function renderProductDetails() {
         document.getElementById("p-name").textContent = "المنتج غير موجود";
         const addBtn = document.getElementById("p-add-btn");
         if (addBtn) addBtn.disabled = true;
+        const buyBtnNF = document.getElementById("p-buy-btn");
+        if (buyBtnNF) buyBtnNF.style.display = "none";
         return;
     }
 
@@ -38,6 +40,8 @@ function renderProductDetails() {
             addBtn.style.color = "#fff";
             addBtn.style.cursor = "not-allowed";
         }
+        const buyBtnHidden = document.getElementById("p-buy-btn");
+        if (buyBtnHidden) buyBtnHidden.style.display = "none";
         return;
     }
 
@@ -94,6 +98,22 @@ function renderProductDetails() {
             newAddBtn.style.cursor = "pointer";
             newAddBtn.addEventListener("click", (event) => {
                 addToCart(cat, id, event);
+            });
+        }
+    }
+
+    // ⚡ زرار "اشتر الآن": يدخل على بيانات الطلب مباشرة من غير إضافة للسلة
+    const buyBtn = document.getElementById("p-buy-btn");
+    if (buyBtn) {
+        const newBuyBtn = buyBtn.cloneNode(true);
+        buyBtn.parentNode.replaceChild(newBuyBtn, buyBtn);
+
+        if (isComingSoon) {
+            newBuyBtn.style.display = "none";
+        } else {
+            newBuyBtn.style.display = "";
+            newBuyBtn.addEventListener("click", (event) => {
+                buyNow(cat, id, event);
             });
         }
     }

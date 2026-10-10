@@ -27,7 +27,7 @@ function renderProductsGrid(items) {
         const isComingSoon = item.comingSoon === true || item.status === 'coming_soon';
         const buttonHTML = isComingSoon 
             ? `<button class="add-to-cart-btn" disabled onclick="event.stopPropagation();" style="background: #c5a880; color: #fff; cursor: not-allowed; border: none;"><i class="fa-solid fa-hourglass-half"></i> سيتوفر قريباً</button>`
-            : `<button class="add-to-cart-btn" onclick="addToCart('${categoryType}', '${item.id}', event)">إضافة للسلة</button>`;
+            : `<button class="add-to-cart-btn" onclick="addToCart('${categoryType}', '${item.id}', event)">إضافة للسلة</button><button class="add-to-cart-btn buy-now-btn-cat" onclick="buyNow('${categoryType}', '${item.id}', event)">اشتر الآن</button>`;
 
         cardsHTML += `
             <div class="product-card" onclick="goToProductDetails('${categoryType}', '${item.id}')">

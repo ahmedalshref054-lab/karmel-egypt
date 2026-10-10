@@ -143,6 +143,57 @@ function addToCart(category, productId, event) {
     showCartToast(`${product.name} اتضافت للسلة ✅`);
 }
 
+/* ===== اشتر الآن: يفتح صفحة بيانات الطلب مباشرة بالمنتج ده بس، من غير ما يتضاف للسلة ===== */
+function buyNow(category, productId, event) {
+    if (event) {
+        event.stopPropagation();
+    }
+
+    if (!allProductsMasterData[category]) return;
+    const product = allProductsMasterData[category].items.find(item => item.id === productId);
+    if (!product) return;
+
+    const isHidden = product.hidden === true || product.status === 'hidden';
+    const isComingSoon = product.comingSoon === true || product.status === 'coming_soon';
+    if (isHidden) {
+        alert("عذراً، هذا المنتج غير متاح حالياً.");
+        return;
+    }
+    if (isComingSoon) {
+        alert("هذا المنتج غير متوفر حالياً وسيتوفر قريباً.");
+        return;
+    }
+
+    const buyNowItem = {
+        id: product.id,
+        name: product.name,
+        price: parseInt(product.newPrice),
+        image: product.image,
+        quantity: 1
+    };
+    sessionStorage.setItem('auria_buy_now', JSON.stringify([buyNowItem]));
+    window.location.href = 'cart.html?buynow=1';
+}
+window.buyNow = buyNow;
+
+// وضع "اشتر الآن": بنقرا المنتج المؤقت بدل السلة، بس لو الرابط فيه buynow=1
+function isBuyNowMode() {
+    return new URLSearchParams(window.location.search).get('buynow') === '1'
+        && !!sessionStorage.getItem('auria_buy_now');
+}
+
+function getBuyNowItems() {
+    try {
+        return JSON.parse(sessionStorage.getItem('auria_buy_now')) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveBuyNowItems(items) {
+    sessionStorage.setItem('auria_buy_now', JSON.stringify(items));
+}
+
 function updateCartCount() {
     const cart = getCart();
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -291,14 +342,35 @@ function stopLiveOrdersListener() {
 
 // حفظ أوردر جديد سحابياً
 async function saveOrderToCloud(newOrder) {
-    try {
-        await fetch(`${FIREBASE_DB_URL}orders/${newOrder.id}.json`, {
+    // Firebase بيرجع رفض الصلاحيات/الفاليديشن كرد HTTP عادي (مش error)،
+    // فلازم نفحص response.ok بنفسنا، وإلا الأوردر يضيع والعميل يشوف "تم بنجاح"
+    const putOrder = async (order) => {
+        const response = await fetch(`${FIREBASE_DB_URL}orders/${order.id}.json`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newOrder)
+            body: JSON.stringify(order)
         });
+        if (!response.ok) {
+            const details = await response.text().catch(() => '');
+            throw new Error(`Firebase رفض حفظ الأوردر (HTTP ${response.status}) ${details}`);
+        }
+    };
+
+    try {
+        await putOrder(newOrder);
     } catch (error) {
         console.error("Error saving order:", error);
+
+        // لو الأوردر فيه رقم تاني وقواعد الفايربيز رافضة الحقل الجديد (phone2)،
+        // نعيد المحاولة بنفس الأوردر لكن الرقم التاني متكتوب جوه العنوان بدل حقل مستقل
+        if (newOrder.customer && newOrder.customer.phone2) {
+            const fallbackOrder = JSON.parse(JSON.stringify(newOrder));
+            fallbackOrder.customer.address = `${fallbackOrder.customer.address} | تليفون تاني: ${fallbackOrder.customer.phone2}`;
+            delete fallbackOrder.customer.phone2;
+            await putOrder(fallbackOrder);
+            return;
+        }
+        throw error; // sendOrderToWhatsApp هيعرض للعميل رسالة الخطأ ويرجّع الزرار
     }
 }
 
@@ -483,7 +555,7 @@ async function saveOrderToGoogleSheets(order) {
             createdAt: order.createdAt,
             customer: {
                 name: order.customer.name,
-                phone: order.customer.phone,
+                phone: order.customer.phone2 ? `${order.customer.phone} / ${order.customer.phone2}` : order.customer.phone,
                 governorate: order.customer.governorate,
                 address: order.customer.address
             },
@@ -524,8 +596,9 @@ async function saveOrderToGoogleSheets(order) {
    ============================================================ *//* ============================================================
    إرسال الطلب وإدخاله للآدمن وللشيت (إصدار الاستقرار التام)
    ============================================================ */
-async function sendOrderToWhatsApp(customerName, customerPhone, customerAddress, customerGovernorate, shippingCost, paymentMethod, paymentProofImage) {
-    const cart = getCart();
+async function sendOrderToWhatsApp(customerName, customerPhone, customerAddress, customerGovernorate, shippingCost, paymentMethod, paymentProofImage, customerPhone2) {
+    const buyNowMode = isBuyNowMode();
+    const cart = buyNowMode ? getBuyNowItems() : getCart();
     if (cart.length === 0) {
         alert("سلتك فارغة حالياً!");
         return;
@@ -570,6 +643,11 @@ async function sendOrderToWhatsApp(customerName, customerPhone, customerAddress,
         items: cart
     };
 
+    // الرقم التاني اختياري - بنحفظه بس لو العميل كتبه
+    if (customerPhone2) {
+        newOrder.customer.phone2 = customerPhone2;
+    }
+
     // نضيف رابط صورة إثبات التحويل بس لو فعلاً موجودة (عشان منحطش حقل فاضي في الأوردرات العادية)
     if (method === 'transfer' && paymentProofImage) {
         newOrder.paymentProofImage = paymentProofImage;
@@ -581,7 +659,12 @@ async function sendOrderToWhatsApp(customerName, customerPhone, customerAddress,
         // 2. إرسال الطلب تلقائياً إلى جدول بيانات جوجل شيت للطباعة
         await saveOrderToGoogleSheets(newOrder);
 
-        localStorage.removeItem('auria_cart');
+        if (buyNowMode) {
+            // شراء مباشر: بنمسح المنتج المؤقت بس، والسلة الأصلية تفضل زي ما هي
+            sessionStorage.removeItem('auria_buy_now');
+        } else {
+            localStorage.removeItem('auria_cart');
+        }
         updateCartCount();
 
         alert(`✅ تم استلام طلبك بنجاح! \nرقم الطلب الخاص بك هو: ${orderId} \n\nشكرًا لتسوقك من كارميل مصر، سيتواصل معك فريق خدمة العملاء قريباً لتأكيد الشحن.`);
@@ -946,7 +1029,7 @@ function renderHomePageProducts() {
                 const isComingSoon = item.comingSoon === true || item.status === 'coming_soon';
                 const buttonHTML = isComingSoon 
                     ? `<button class="cart-add-btn" disabled onclick="event.stopPropagation();" style="background: #c5a880; color: #fff; cursor: not-allowed; border: none;"><i class="fa-solid fa-hourglass-half"></i> سيتوفر قريباً</button>`
-                    : `<button class="cart-add-btn" onclick="addToCart('oils', '${item.id}', event)">إضافة للسلة</button>`;
+                    : `<button class="cart-add-btn" onclick="addToCart('oils', '${item.id}', event)">إضافة للسلة</button><button class="cart-add-btn buy-now-btn" onclick="buyNow('oils', '${item.id}', event)">اشتر الآن</button>`;
 
                 return `
                     <div class="home-product-card" onclick="goToDirectProduct('oils', '${item.id}')">
@@ -973,7 +1056,7 @@ function renderHomePageProducts() {
                 const isComingSoon = item.comingSoon === true || item.status === 'coming_soon';
                 const buttonHTML = isComingSoon 
                     ? `<button class="cart-add-btn" disabled onclick="event.stopPropagation();" style="background: #c5a880; color: #fff; cursor: not-allowed; border: none;"><i class="fa-solid fa-hourglass-half"></i> سيتوفر قريباً</button>`
-                    : `<button class="cart-add-btn" onclick="addToCart('boxes', '${item.id}', event)">إضافة للسلة</button>`;
+                    : `<button class="cart-add-btn" onclick="addToCart('boxes', '${item.id}', event)">إضافة للسلة</button><button class="cart-add-btn buy-now-btn" onclick="buyNow('boxes', '${item.id}', event)">اشتر الآن</button>`;
 
                 return `
                     <div class="home-product-card" onclick="goToDirectProduct('boxes', '${item.id}')">
@@ -1000,7 +1083,7 @@ function renderHomePageProducts() {
                 const isComingSoon = item.comingSoon === true || item.status === 'coming_soon';
                 const buttonHTML = isComingSoon 
                     ? `<button class="cart-add-btn" disabled onclick="event.stopPropagation();" style="background: #c5a880; color: #fff; cursor: not-allowed; border: none;"><i class="fa-solid fa-hourglass-half"></i> سيتوفر قريباً</button>`
-                    : `<button class="cart-add-btn" onclick="addToCart('packages', '${item.id}', event)">إضافة للسلة</button>`;
+                    : `<button class="cart-add-btn" onclick="addToCart('packages', '${item.id}', event)">إضافة للسلة</button><button class="cart-add-btn buy-now-btn" onclick="buyNow('packages', '${item.id}', event)">اشتر الآن</button>`;
 
                 return `
                     <div class="home-product-card" onclick="goToDirectProduct('packages', '${item.id}')">
@@ -1027,7 +1110,7 @@ function renderHomePageProducts() {
                 const isComingSoon = item.comingSoon === true || item.status === 'coming_soon';
                 const buttonHTML = isComingSoon 
                     ? `<button class="cart-add-btn" disabled onclick="event.stopPropagation();" style="background: #c5a880; color: #fff; cursor: not-allowed; border: none;"><i class="fa-solid fa-hourglass-half"></i> قريباً ⌛</button>`
-                    : `<button class="cart-add-btn" onclick="addToCart('natural', '${item.id}', event)">إضافة للسلة 🛒</button>`;
+                    : `<button class="cart-add-btn" onclick="addToCart('natural', '${item.id}', event)">إضافة للسلة 🛒</button><button class="cart-add-btn buy-now-btn" onclick="buyNow('natural', '${item.id}', event)">اشتر الآن</button>`;
 
                 return `
                     <div class="natural-card" onclick="goToDirectProduct('natural', '${item.id}')">
@@ -1061,5 +1144,139 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCategoryCards();
     initializeAndLoadCategoryCards().then(() => {
         renderCategoryCards();
+    });
+});
+
+/* ============================================================
+   البحث في المنتجات (أيقونة العدسة في الهيدر - شغالة في كل صفحات الموقع)
+   بيدور في أسماء كل المنتجات في كل الأقسام ويفتح صفحة المنتج عند الضغط
+   ============================================================ */
+function normalizeSearchText(text) {
+    return String(text || '')
+        .toLowerCase()
+        .replace(/[\u064B-\u065F\u0670\u0640]/g, '')   // التشكيل والتطويل
+        .replace(/[أإآٱ]/g, 'ا')
+        .replace(/ى/g, 'ي')
+        .replace(/ة/g, 'ه')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function escapeSearchHtml(text) {
+    return String(text == null ? '' : text)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+let searchOverlayEl = null;
+let searchDataRefreshed = false;
+
+function buildSearchOverlay() {
+    if (searchOverlayEl) return searchOverlayEl;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'site-search-overlay';
+    overlay.innerHTML = `
+        <div class="site-search-panel" role="dialog" aria-label="البحث في المنتجات">
+            <div class="site-search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="site-search-input" placeholder="ابحث عن منتج..." autocomplete="off">
+                <button type="button" class="site-search-close" aria-label="إغلاق البحث">&times;</button>
+            </div>
+            <div class="site-search-results" id="site-search-results"></div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeSiteSearch();
+    });
+    overlay.querySelector('.site-search-close').addEventListener('click', closeSiteSearch);
+    overlay.querySelector('#site-search-input').addEventListener('input', (e) => {
+        renderSearchResults(e.target.value);
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeSiteSearch();
+    });
+
+    searchOverlayEl = overlay;
+    return overlay;
+}
+
+function renderSearchResults(query) {
+    const resultsBox = document.getElementById('site-search-results');
+    if (!resultsBox) return;
+
+    const words = normalizeSearchText(query).split(' ').filter(Boolean);
+    if (words.length === 0) {
+        resultsBox.innerHTML = '<p class="site-search-hint">اكتب اسم المنتج اللي بتدور عليه</p>';
+        return;
+    }
+
+    const matches = [];
+    Object.keys(allProductsMasterData).forEach(cat => {
+        const group = allProductsMasterData[cat];
+        if (!group || !Array.isArray(group.items)) return;
+        group.items.forEach(item => {
+            if (item.hidden === true || item.status === 'hidden') return; // المنتجات المخفية مش بتظهر
+            const haystack = normalizeSearchText(`${item.name} ${group.title || ''}`);
+            if (words.every(w => haystack.includes(w))) {
+                matches.push({ cat, item, categoryTitle: group.title || '' });
+            }
+        });
+    });
+
+    if (matches.length === 0) {
+        resultsBox.innerHTML = '<p class="site-search-hint">مفيش منتجات مطابقة لبحثك</p>';
+        return;
+    }
+
+    resultsBox.innerHTML = matches.map(m => {
+        const isComingSoon = m.item.comingSoon === true || m.item.status === 'coming_soon';
+        return `
+            <a class="site-search-item" href="product.html?cat=${encodeURIComponent(m.cat)}&id=${encodeURIComponent(m.item.id)}">
+                <img src="${escapeSearchHtml(m.item.image)}" alt="" loading="lazy">
+                <div class="site-search-item-info">
+                    <span class="site-search-item-name">${escapeSearchHtml(m.item.name)}</span>
+                    <span class="site-search-item-meta">${escapeSearchHtml(m.categoryTitle)}${isComingSoon ? ' • سيتوفر قريباً' : ''}</span>
+                </div>
+                <span class="site-search-item-price">${escapeSearchHtml(m.item.newPrice)}</span>
+            </a>
+        `;
+    }).join('');
+}
+
+function openSiteSearch() {
+    const overlay = buildSearchOverlay();
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    const input = document.getElementById('site-search-input');
+    input.value = '';
+    renderSearchResults('');
+    input.focus();
+
+    // أول مرة بس: نجيب أحدث نسخة من المنتجات (مهم في الصفحات اللي مش بتحمل كل الأقسام)
+    if (!searchDataRefreshed && typeof initializeAndLoadProducts === 'function') {
+        searchDataRefreshed = true;
+        initializeAndLoadProducts().then(() => {
+            if (overlay.classList.contains('open')) renderSearchResults(input.value);
+        });
+    }
+}
+
+function closeSiteSearch() {
+    if (searchOverlayEl) searchOverlayEl.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.header-icons .icon-link').forEach(link => {
+        if (link.querySelector('.fa-magnifying-glass')) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                openSiteSearch();
+            });
+        }
     });
 });

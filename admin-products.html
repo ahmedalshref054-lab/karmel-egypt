@@ -288,6 +288,43 @@
             .containers-grid { grid-template-columns: 1fr; }
         }
 
+        /* ===== شاشة الجرد الشهري ===== */
+        .inventory-controls {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+        }
+        .inventory-controls label { font-weight: bold; color: #0d3b1e; font-size: 14px; }
+        .inventory-controls input[type="month"] {
+            padding: 8px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; font-family: inherit;
+        }
+        .inventory-print-btn {
+            background: #0d3b1e; color: #fff; border: none; padding: 9px 18px; border-radius: 8px;
+            font-size: 14px; font-weight: bold; cursor: pointer; font-family: inherit;
+        }
+        .inventory-print-btn:hover { background: #16532d; }
+        #inventory-printable { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .inventory-title { text-align: center; color: #0d3b1e; font-size: 20px; margin: 0 0 4px 0; }
+        .inventory-subtitle { text-align: center; color: #777; font-size: 13px; margin: 0 0 18px 0; }
+        .inventory-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .inventory-table th, .inventory-table td { border: 1px solid #ddd; padding: 9px 12px; text-align: center; }
+        .inventory-table th { background: #0d3b1e; color: #fff; }
+        .inventory-table td.inv-name { text-align: right; font-weight: bold; color: #0d3b1e; }
+        .inventory-table tbody tr:nth-child(even) { background: #faf8f2; }
+        .inventory-table tfoot td { background: #ece6d3; font-weight: bold; }
+        .inventory-summary { margin-top: 20px; text-align: center; }
+        .inventory-grand-total {
+            display: inline-block; background: #0d3b1e; color: #fff; padding: 12px 30px;
+            border-radius: 12px; font-size: 20px; font-weight: bold;
+        }
+        .inventory-note { color: #777; font-size: 12px; margin-top: 10px; }
+        @media print {
+            body * { visibility: hidden; }
+            #inventory-printable, #inventory-printable * { visibility: visible; }
+            #inventory-printable { position: absolute; top: 0; right: 0; left: 0; box-shadow: none; padding: 10px; }
+            .inventory-table th, .inventory-grand-total, .inventory-table tfoot td {
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+        }
+
         /* ===== شاشة التقارير (كل يوم في بلوك منفصل) ===== */
         .report-day-block {
             margin-bottom: 26px;
@@ -534,6 +571,9 @@
                 <button class="sidebar-item" id="sidebar-btn-reports" onclick="switchAdminView('reports')">
                     <i class="fa-solid fa-chart-column"></i> التقارير
                 </button>
+                <button class="sidebar-item" id="sidebar-btn-inventory" onclick="switchAdminView('inventory')">
+                    <i class="fa-solid fa-clipboard-list"></i> الجرد
+                </button>
             </aside>
 
             <main class="admin-content">
@@ -580,6 +620,19 @@
                     <h2 class="view-title"><i class="fa-solid fa-chart-column"></i> التقارير</h2>
                     <p style="color:#666; font-size:13px; margin-bottom:20px;">كل الأوردرات اللي تم تجهيزها، كل يوم منفصل عن التاني. الحذف من هنا نهائي ومش هيرجع تاني.</p>
                     <div id="reports-wrapper"></div>
+                </div>
+
+                <!-- شاشة الجرد الشهري: كمية كل منتج اتباعت في الشهر + إجمالي المبيعات (للطباعة) -->
+                <div id="view-inventory" class="admin-view">
+                    <div class="inventory-controls">
+                        <label for="inventory-month"><i class="fa-solid fa-calendar-days"></i> الشهر:</label>
+                        <input type="month" id="inventory-month" onchange="renderInventoryView()">
+                        <button class="inventory-print-btn" onclick="printInventory()"><i class="fa-solid fa-print"></i> طباعة الجرد</button>
+                    </div>
+                    <div id="inventory-printable">
+                        <h2 class="inventory-title"><i class="fa-solid fa-clipboard-list"></i> الجرد الشهري - Karmel Egypt</h2>
+                        <div id="inventory-wrapper"></div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -1078,6 +1131,7 @@
                     <h3><i class="fa-solid fa-user"></i> بيانات العميل</h3>
                     <p><strong>الاسم:</strong> ${order.customer.name}</p>
                     <p><strong>الهاتف:</strong> ${order.customer.phone}</p>
+                    ${order.customer.phone2 ? `<p><strong>هاتف تاني:</strong> ${order.customer.phone2}</p>` : ''}
                     <p><strong>المحافظة:</strong> ${order.customer.governorate || '-'}</p>
                     <p><strong>العنوان:</strong> ${order.customer.address}</p>
                     <button class="whatsapp-contact-btn" onclick="openWhatsAppChat('${order.customer.phone}', 'أهلاً ${order.customer.name}، بخصوص طلبك رقم ${order.id} من كارميل مصر...')">
@@ -1104,6 +1158,90 @@
             document.getElementById('order-modal-overlay').classList.remove('active');
         }
 
+        /* ============================================================
+           شاشة الجرد الشهري: بنجمع كل الأوردرات اللي "تم تجهيزها" (سجل التقارير)
+           في الشهر المختار، ونعرض كل منتج وكام قطعة اتباعت منه + إجمالي المبيعات
+           ============================================================ */
+        function escapeInventoryText(text) {
+            return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        async function renderInventoryView() {
+            const monthInput = document.getElementById('inventory-month');
+            if (!monthInput.value) {
+                const now = new Date();
+                monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            }
+            const monthKey = monthInput.value; // YYYY-MM
+            const [year, month] = monthKey.split('-').map(Number);
+            const monthLabel = new Date(year, month - 1, 1).toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
+
+            const wrapper = document.getElementById('inventory-wrapper');
+            wrapper.innerHTML = '<p style="color:#999; font-size:13px; text-align:center;">جاري تحميل الجرد...</p>';
+
+            const reports = await getDailyReports();
+
+            const products = {};
+            let ordersCount = 0;
+            let shippingTotal = 0;
+
+            Object.keys(reports).filter(dateKey => dateKey.startsWith(monthKey)).forEach(dateKey => {
+                Object.values(reports[dateKey] || {}).forEach(order => {
+                    ordersCount++;
+                    shippingTotal += Number(order.shippingCost) || 0;
+                    Object.values(order.items || {}).forEach(item => {
+                        const name = String(item.name || '').trim() || 'منتج بدون اسم';
+                        const qty = Number(item.quantity) || 0;
+                        const price = Number(item.price) || 0;
+                        if (!products[name]) products[name] = { name: name, qty: 0, revenue: 0 };
+                        products[name].qty += qty;
+                        products[name].revenue += qty * price;
+                    });
+                });
+            });
+
+            const rows = Object.values(products).sort((a, b) => b.qty - a.qty);
+
+            if (rows.length === 0) {
+                wrapper.innerHTML = `<p class="inventory-subtitle">جرد شهر ${monthLabel}</p>
+                    <p style="color:#999; font-size:13px; text-align:center;">لا يوجد أي أوردرات تم تجهيزها في هذا الشهر.</p>`;
+                return;
+            }
+
+            const totalQty = rows.reduce((sum, r) => sum + r.qty, 0);
+            const totalRevenue = rows.reduce((sum, r) => sum + r.revenue, 0);
+            const fmt = n => n.toLocaleString('ar-EG');
+
+            wrapper.innerHTML = `
+                <p class="inventory-subtitle">جرد شهر ${monthLabel} - عدد الأوردرات: ${fmt(ordersCount)}</p>
+                <table class="inventory-table">
+                    <thead>
+                        <tr><th>#</th><th>المنتج</th><th>الكمية المباعة</th><th>إجمالي مبيعات المنتج (ج.م)</th></tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map((r, i) => `
+                            <tr>
+                                <td>${fmt(i + 1)}</td>
+                                <td class="inv-name">${escapeInventoryText(r.name)}</td>
+                                <td>${fmt(r.qty)} قطعة</td>
+                                <td>${fmt(r.revenue)}</td>
+                            </tr>`).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr><td colspan="2">إجمالي القطع المباعة</td><td>${fmt(totalQty)} قطعة</td><td>${fmt(totalRevenue)}</td></tr>
+                    </tfoot>
+                </table>
+                <div class="inventory-summary">
+                    <div class="inventory-grand-total">إجمالي المبيعات: ${fmt(totalRevenue)} ج.م</div>
+                    <p class="inventory-note">الإجمالي أعلاه هو مجموع المنتجات فقط. إجمالي الشحن في الشهر: ${fmt(shippingTotal)} ج.م، والإجمالي شامل الشحن: ${fmt(totalRevenue + shippingTotal)} ج.م</p>
+                </div>
+            `;
+        }
+
+        function printInventory() {
+            window.print();
+        }
+
         function switchAdminView(viewName) {
             currentAdminView = viewName;
             // نحفظ آخر شاشة كان الأدمن فاتحها عشان لو عمل ريفرش يرجعله لنفس الشاشة
@@ -1119,6 +1257,7 @@
             document.getElementById('view-shipping').classList.remove('active-view');
             document.getElementById('view-containers').classList.remove('active-view');
             document.getElementById('view-reports').classList.remove('active-view');
+            document.getElementById('view-inventory').classList.remove('active-view');
 
             const mainSaveBar = document.getElementById('main-save-bar');
 
@@ -1138,6 +1277,10 @@
                 document.getElementById('view-reports').classList.add('active-view');
                 mainSaveBar.style.display = 'none';
                 renderReportsView();
+            } else if (viewName === 'inventory') {
+                document.getElementById('view-inventory').classList.add('active-view');
+                mainSaveBar.style.display = 'none';
+                renderInventoryView();
             } else {
                 document.getElementById('view-products').classList.add('active-view');
                 mainSaveBar.style.display = 'flex';
